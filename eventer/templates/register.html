@@ -1,0 +1,141 @@
+{% extends "template.html" %}
+
+
+{% block "content" %}
+
+<h3>Register</h3>
+
+<form id="reg-form" action="/endpoint/register" method="post" class="form-horizontal">
+
+    <div class="form-group">
+        <label for="username-input" class="control-label col-lg-3">Username</label>
+
+        <div class="col-lg-5">
+            <input type="text" id="username-input" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="first-name-input" class="control-label col-lg-3">First name</label>
+
+        <div class="col-lg-5">
+            <input type="text" id="first-name-input" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="last-name-input" class="control-label col-lg-3">Last name</label>
+
+        <div class="col-lg-5">
+            <input type="text" id="last-name-input" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="email-input" class="control-label col-lg-3">Email</label>
+
+        <div class="col-lg-5">
+            <input type="text" id="email-input" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="password-input" class="control-label col-lg-3">Password</label>
+
+        <div class="col-lg-5">
+            <input type="password" id="password-input" class="form-control">
+        </div>
+    </div>
+
+    <ul class="text-danger col-lg-offset-3" id="error-list"></ul>
+
+    <button class="btn btn-primary col-lg-offset-3" id="register-button">Register</button>
+
+</form>
+
+<script>
+    var validateUsername = function (username, errorList) {
+        if (username.length < 6) {
+            errorList.append("<li>Username: At least 6 characters required</li>");
+            return false;
+        }
+        return true;
+    };
+
+    var validateFirstName = function (firstName, errorList) {
+        if (firstName === "") {
+            errorList.append("<li>First name: Required</li>");
+            return false;
+
+        }
+        return true;
+    };
+
+    var validateLastName = function (lastName, errorList) {
+        if (lastName === "") {
+            errorList.append("<li>Last name: Required</li>");
+            return false;
+        }
+        return true;
+    };
+
+    var validateEmail = function (email, errorList) {
+        if (email === "") {
+            errorList.append("<li>Email: Required</li>");
+            return false;
+        }
+        return true;
+    };
+
+    var validatePassword = function (password, errorList) {
+        if (password.length < 6) {
+            errorList.append("<li>Password: At least 6 characters required</li>");
+            return false;
+        }
+        return true;
+    };
+
+    $("#register-button").on("click", function (e) {
+        e.preventDefault();
+        var errorList = $("#error-list");
+        errorList.empty();
+
+        var username = $("#username-input").val();
+        var email = $("#email-input").val();
+        var firstName = $("#first-name-input").val();
+        var lastName = $("#last-name-input").val();
+        var password = $("#password-input").val();
+
+        var usernameIsValid = validateUsername(username, errorList);
+        var emailIsValid = validateEmail(email, errorList);
+        var firstNameIsValid = validateFirstName(firstName, errorList);
+        var lastNameIsValid = validateLastName(lastName, errorList);
+        var passwordIsValid = validatePassword(password, errorList);
+
+        if (usernameIsValid && emailIsValid && firstNameIsValid && lastNameIsValid && passwordIsValid) {
+            var form = $("#reg-form");
+            var _xsrf_cookie = document.cookie.match("\\b_xsrf=([^;]*)\\b")
+            $.ajax({
+                url: form.attr("action"),
+                method: form.attr("method"),
+                data: {
+                    username: username,
+                    password: password,
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email,
+                    _xsrf: _xsrf_cookie ? _xsrf_cookie[1] : undefined
+                },
+                success: function (data) {
+                    alert(data);
+                },
+                error: function (req, status, error) {
+                    alert(status);
+                }
+            });
+        }
+    });
+</script>
+
+
+{% end %}

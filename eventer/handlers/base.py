@@ -13,6 +13,9 @@ class DefaultContextRequestHandler(tornado.web.RequestHandler):
 
 
 class AuthenticationRequiredHandler(DefaultContextRequestHandler):
+    """
+    Class for defining routes that need authentication - valid auth token stored in database
+    """
     # noinspection PyMethodOverriding
     def initialize(self, database):
         self.database = database
@@ -22,6 +25,9 @@ class AuthenticationRequiredHandler(DefaultContextRequestHandler):
 
 
 class HttpPageHandler(DefaultContextRequestHandler):
+    """
+    Class for defining routes that do not need authentication and are public
+    """
     pass
 
 
