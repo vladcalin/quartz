@@ -1,4 +1,6 @@
+import logging
 import datetime
+import uuid
 
 from mongoengine import connect, Document, StringField, IntField, BooleanField, BinaryField, DateTimeField
 
@@ -13,3 +15,9 @@ class User(Document):
     password = BinaryField()
     active = BooleanField(default=True)
     date_joined = DateTimeField(default=datetime.datetime.now)
+
+    session_token = StringField()
+
+    @staticmethod
+    def generate_session_token():
+        return str(uuid.uuid4())

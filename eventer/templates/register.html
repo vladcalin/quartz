@@ -116,7 +116,7 @@
 
         if (usernameIsValid && emailIsValid && firstNameIsValid && lastNameIsValid && passwordIsValid) {
             var form = $("#reg-form");
-            var _xsrf_cookie = document.cookie.match("\\b_xsrf=([^;]*)\\b")
+            var _xsrf_cookie = document.cookie.match("\\b_xsrf=([^;]*)\\b");
             $.ajax({
                 url: form.attr("action"),
                 method: form.attr("method"),
@@ -129,10 +129,16 @@
                     _xsrf: _xsrf_cookie ? _xsrf_cookie[1] : undefined
                 },
                 success: function (data) {
-                    alert(data);
+                    if (data.success) {
+                        window.location.href = "/";
+                    }
                 },
                 error: function (req, status, error) {
-                    alert(status);
+                    var errors = JSON.parse(error).errors;
+                    alert(errors);
+                    for (var i = 0; i <= errors.length; i++) {
+                        errorList.append("<li>" + errors[i] + "</li>");
+                    }
                 }
             });
         }
