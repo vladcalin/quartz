@@ -1,18 +1,37 @@
 import logging
 
+import bcrypt
+import simplejson
 import tornado.gen
+from mongoengine.errors import NotUniqueError
 
 from eventer.handlers.base import HttpPageHandler
+from eventer.models import User
 
 
 class RegisterEndpointHandler(HttpPageHandler):
     @tornado.gen.coroutine
-    def validate_username(self, username):
-        return True
+    def validate_username_and_email(self, username, email):
+        result = []
+        username_valid = User.objects(username=username).count()
+        if username_valid:
+            result.append("Username already taken")
+        email_valid = User.objects(email=email).count()
+        if email_valid:
+            result.append("Email already in use")
+        return result
 
     @tornado.gen.coroutine
-    def validate_email(self, email):
-        return True
+    def persist_user(self, username, password, first_name, last_name, email):
+        user_instance = User()
+        user_instance.username = username
+        user_instance.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        user_instance.first_name = first_name
+        user_instance.last_name = last_name
+        user_instance.email = email
+        user_instance.save()
+
+        return user_instance
 
     @tornado.gen.coroutine
     def post(self, *args, **kwargs):
@@ -25,17 +44,9 @@ class RegisterEndpointHandler(HttpPageHandler):
         errors = []
         if not username:
             errors.append("Username is mandatory")
-        else:
-            username_is_unique = yield from self.validate_username(username)
-            if not username_is_unique:
-                errors.append("Username taken")
 
         if not email:
             errors.append("Email is mandatory")
-        else:
-            email_is_unique = yield from self.validate_email(email)
-            if not email_is_unique:
-                errors.append("Email already in use")
 
         if not password:
             errors.append("Password is mandatory")
@@ -45,3 +56,15 @@ class RegisterEndpointHandler(HttpPageHandler):
 
         if not last_name:
             errors.append("Last name is mandatory")
+
+        validate_result_errors = yield self.validate_username_and_email(username, email)
+        if validate_result_errors:
+            errors.extend(validate_result_errors)
+
+        if errors:
+            self.set_status(400, simplejson.dumps({"success": False, "errors": errors}))
+            return
+
+        registered_user = yield self.persist_user(username, password, first_name, last_name, email)
+        logging.debug("Registered used: {}".format(registered_user.id))
+        self.write(simplejson.dumps({"success": True}))
