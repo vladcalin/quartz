@@ -23,6 +23,12 @@
         </div>
     </div>
 
+    <ul class="text-danger col-lg-offset-3" id="error-list">
+
+    </ul>
+
+    {% module xsrf_form_html() %}
+
     <button class="btn btn-primary col-lg-offset-3" id="login-button">Login</button>
 
 </form>
@@ -30,8 +36,45 @@
 <script>
     $("#login-button").on("click", function (e) {
         e.preventDefault();
-        console.log($(this));
-    })
+        var username = $("#username-input").val();
+        var password = $("#password-input").val();
+        var xsrf = $("input[name='_xsrf']").val();
+
+        var errorList = $("#error-list");
+        errorList.empty();
+
+        if (username == "") {
+            errorList.append("<li>" + "Username required" + "</li>")
+        }
+
+        if (password == "") {
+            errorList.append("<li>" + "Password required" + "</li>")
+        }
+
+        if (errorList.children().length != 0) {
+            return;
+        }
+
+        $.ajax({
+            url: "/endpoint/authenticate",
+            method: "post",
+            data: {
+                username: username,
+                password: password,
+                _xsrf: xsrf
+            },
+            success: function (data) {
+                var dataJson = JSON.parse(data);
+                if (dataJson.success) {
+                    window.location.href = "/";
+                }
+            },
+            error: function (code, msg, error) {
+                errorList.append("<li>" + msg + "</li>");
+            }
+        });
+
+    });
 </script>
 
 {% end %}

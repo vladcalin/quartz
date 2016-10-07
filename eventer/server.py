@@ -5,7 +5,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.log
 
-from eventer.handlers.ui import IndexHandler, DocumentationHandler, LoginHandler, RegisterHandler
+from eventer.handlers.ui import IndexHandler, DocumentationHandler, LoginHandler, RegisterHandler, EventsHandler
 from eventer.handlers.endpoints import RegisterEndpointHandler, AuthenticationEndpointHandler, LogoutEndpointHandler
 
 
@@ -16,11 +16,12 @@ def make_app(app_settings):
         (r'/doc', DocumentationHandler),
         (r'/login', LoginHandler),
         (r'/register', RegisterHandler),
+        (r'/events', EventsHandler),
 
         # endpoints
         (r'/endpoint/register', RegisterEndpointHandler),
         (r'/endpoint/authenticate', AuthenticationEndpointHandler),
-        (r'/logout', LogoutEndpointHandler),
+        (r'/endpoint/logout', LogoutEndpointHandler),
 
         # static routes
         (r'/static/(.*)', tornado.web.StaticFileHandler),

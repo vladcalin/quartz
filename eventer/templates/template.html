@@ -24,18 +24,16 @@
 
                     {% if current_user %}
 
-                        <li><a href="/logout">Logout</a></li>
+                    <li><a href="#" id="logout">Logout</a></li>
 
-                        <li class="divider-vertical"></li>
+                    <li class="divider-vertical"></li>
 
-                        <li><a href="/categories">Event categories</a></li>
-                        <li><a href="/events">Registered events</a></li>
-                        <li><a href="/projects">Projects</a></li>
+                    <li><a href="/events">Events</a></li>
 
                     {% else %}
 
-                        <li><a href="/login">Login</a></li>
-                        <li><a href="/register">Register</a></li>
+                    <li><a href="/login">Login</a></li>
+                    <li><a href="/register">Register</a></li>
 
                     {% end %}
                 </ul>
@@ -47,6 +45,29 @@
     adadas
     {% end %}
 </div>
+
+{% module xsrf_form_html() %}
+
+<script>
+    $("#logout").on('click', function (event) {
+        event.preventDefault();
+        var cookie = document.cookie.match("\\b_xsrf=([^;]*)\\b");
+        $.ajax({
+            "url": "/endpoint/logout",
+            "method": "post",
+            "data": {
+                "_xsrf": cookie ? cookie[1] : undefined
+            },
+            "success": function (data) {
+                var jsonData = JSON.parse(data);
+                console.log(jsonData);
+                if (jsonData.success) {
+                    window.location.href = "/";
+                }
+            }
+        })
+    });
+</script>
 
 
 </body>

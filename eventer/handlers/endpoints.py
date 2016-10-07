@@ -78,11 +78,12 @@ class AuthenticationEndpointHandler(HttpPageHandler):
     @tornado.gen.coroutine
     def validate_username_and_password(self, username, password):
         try:
-            user = User.objects.get(username)
+            user = User.objects.get(username=username)
         except DoesNotExist:
+            logging.error("Invalid username")
             return False
         else:
-            return bcrypt.checkpw(password.decode(), user.password)
+            return bcrypt.checkpw(password.encode(), user.password)
 
     @tornado.gen.coroutine
     def post(self):
@@ -90,8 +91,8 @@ class AuthenticationEndpointHandler(HttpPageHandler):
             self.set_status(403, "Already authenticated")
             return
 
-        username = self.get_body_arguments("username")
-        password = self.get_body_arguments("password")
+        username = self.get_body_argument("username")
+        password = self.get_body_argument("password")
         is_valid = yield self.validate_username_and_password(username, password)
         if is_valid:
             new_token = User.generate_session_token()
@@ -99,7 +100,7 @@ class AuthenticationEndpointHandler(HttpPageHandler):
             target_user.session_token = new_token
             target_user.save()
             self.set_secure_cookie("Session", new_token)
-            self.redirect("/", permanent=True)
+            self.write(simplejson.dumps({"success": True}))
         else:
             self.set_status(403, "Invalid username or password")
 
@@ -110,8 +111,4 @@ class LogoutEndpointHandler(HttpPageHandler):
         current_user = self.get_current_user()
         current_user.session_token = None
         current_user.save()
-        self.redirect("/", permanent=True)
-
-    @tornado.gen.coroutine
-    def get(self):
-        self.post()
+        self.write(simplejson.dumps({"success": True}))

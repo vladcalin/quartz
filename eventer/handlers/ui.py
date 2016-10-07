@@ -1,6 +1,6 @@
 import tornado.gen
 
-from eventer.handlers.base import HttpPageHandler
+from eventer.handlers.base import HttpPageHandler, AuthenticationRequiredHandler
 
 
 class IndexHandler(HttpPageHandler):
@@ -25,3 +25,9 @@ class RegisterHandler(HttpPageHandler):
     @tornado.gen.coroutine
     def get(self):
         self.render("register.html", **self.get_default_context())
+
+
+class EventsHandler(AuthenticationRequiredHandler):
+    @tornado.gen.coroutine
+    def get(self):
+        self.render("events.html", **self.get_default_context())

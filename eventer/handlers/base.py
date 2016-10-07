@@ -35,12 +35,10 @@ class AuthenticationRequiredHandler(DefaultContextRequestHandler):
     """
     Class for defining routes that need authentication - valid auth token stored in database
     """
-    # noinspection PyMethodOverriding
-    def initialize(self, database):
-        self.database = database
 
     def prepare(self):
-        pass
+        if not self.get_current_user():
+            self.redirect("/login", permanent=True)
 
 
 class HttpPageHandler(DefaultContextRequestHandler):
