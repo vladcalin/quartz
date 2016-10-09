@@ -5,7 +5,8 @@ import tornado.ioloop
 import tornado.web
 import tornado.log
 
-from eventer.handlers.ui import IndexHandler, DocumentationHandler, LoginHandler, RegisterHandler, EventsHandler
+from eventer.handlers.ui import IndexHandler, DocumentationHandler, LoginHandler, RegisterHandler, EventsHandler, \
+    CreateEventCategoryHandler
 from eventer.handlers.endpoints import RegisterEndpointHandler, AuthenticationEndpointHandler, LogoutEndpointHandler
 
 
@@ -17,6 +18,7 @@ def make_app(app_settings):
         (r'/login', LoginHandler),
         (r'/register', RegisterHandler),
         (r'/events', EventsHandler),
+        (r'/create_category', CreateEventCategoryHandler),
 
         # endpoints
         (r'/endpoint/register', RegisterEndpointHandler),

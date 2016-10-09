@@ -2,7 +2,8 @@ import logging
 import datetime
 import uuid
 
-from mongoengine import connect, Document, StringField, IntField, BooleanField, BinaryField, DateTimeField
+from mongoengine import connect, Document, StringField, IntField, BooleanField, BinaryField, DateTimeField, \
+    ReferenceField, DictField
 
 connect(db="eventer", host="127.0.0.1", port=27017)
 
@@ -18,6 +19,74 @@ class User(Document):
 
     session_token = StringField()
 
+    meta = {
+        "indexes": [
+            "#session_token"
+        ]
+    }
+
     @staticmethod
     def generate_session_token():
         return str(uuid.uuid4())
+
+    def renew_session(self):
+        self.session_token = self.generate_session_token()
+        self.save()
+
+    def invalidate_session(self):
+        self.session_token = None
+        self.save()
+
+
+class EventCategory(Document):
+    class FieldType:
+        NUMERIC = "int"
+        STRING = "str"
+        BOOLEAN = "bool"
+        DATETIME = "datetime"
+
+        ALL = [NUMERIC, STRING, BOOLEAN, DATETIME]
+
+    class FieldConstraint:
+        # universal
+        REQUIRED = "req"
+        DEFAULT = "default"
+
+        # int
+        MAX_VALUE = "max_val"
+        MIN_VALUE = "min_val"
+
+        # str
+        MIN_LENGTH = "min_len"
+        MAX_LENGTH = "max_len"
+        REGEX = "regex"
+
+    name = StringField(unique=True)
+    description = StringField()
+    user = ReferenceField(User)
+
+    """
+        Field specification will be kept in the following form:
+            {
+                name: ...,
+                description: ...,
+                type: ...,
+                constraints: ...
+            }
+    """
+    fields = DictField(required=True)
+
+    meta = {
+        "fields": [
+            "#user"
+        ]
+    }
+
+
+class Event(Document):
+    category = ReferenceField(EventCategory, null=False)
+    timestamp = DateTimeField(default=datetime.datetime.now)
+    values = DictField()
+
+    def validate_values(self):
+        pass

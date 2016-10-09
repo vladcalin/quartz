@@ -1,6 +1,7 @@
 import tornado.gen
 
 from eventer.handlers.base import HttpPageHandler, AuthenticationRequiredHandler
+from eventer.models import EventCategory, User
 
 
 class IndexHandler(HttpPageHandler):
@@ -30,4 +31,11 @@ class RegisterHandler(HttpPageHandler):
 class EventsHandler(AuthenticationRequiredHandler):
     @tornado.gen.coroutine
     def get(self):
-        self.render("events.html", **self.get_default_context())
+        events = EventCategory.objects.filter(user=self.get_current_user())
+        self.render("events.html", events=events, **self.get_default_context())
+
+
+class CreateEventCategoryHandler(AuthenticationRequiredHandler):
+    @tornado.gen.coroutine
+    def get(self):
+        self.render("create_event_category.html", **self.get_default_context())

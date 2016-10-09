@@ -26,9 +26,7 @@ class DefaultContextRequestHandler(tornado.web.RequestHandler):
                 return instance
 
     def get_default_context(self):
-        return {
-            "user_is_authenticated": self.get_current_user()
-        }
+        return {}
 
 
 class AuthenticationRequiredHandler(DefaultContextRequestHandler):
@@ -38,7 +36,7 @@ class AuthenticationRequiredHandler(DefaultContextRequestHandler):
 
     def prepare(self):
         if not self.get_current_user():
-            self.redirect("/login", permanent=True)
+            self.redirect("/login")
 
 
 class HttpPageHandler(DefaultContextRequestHandler):

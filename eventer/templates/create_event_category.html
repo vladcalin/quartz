@@ -1,0 +1,209 @@
+{% extends "template.html" %}
+
+
+{% block "content" %}
+
+<h3>Create new event category</h3>
+
+<form action="/endpoint/create_category" method="post" class="form-horizontal">
+
+    <div class="form-group">
+        <label for="name-input" class="control-label col-lg-3">Name</label>
+
+        <div class="col-lg-5">
+            <input type="text" id="name-input" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="desc-input" class="control-label col-lg-3">Description</label>
+
+        <div class="col-lg-5">
+            <input type="text" id="desc-input" class="form-control">
+        </div>
+    </div>
+
+    <div class="col-lg-offset-3">
+        <h4>Values
+            <button class="btn btn-success" id="add-new-value-btn">Add new value</button>
+        </h4>
+        <ul id="values-list"></ul>
+    </div>
+
+    <div id="add-value-form" class="col-lg-offset-3 col-lg-8 jumbotron">
+        <h4>New value</h4>
+
+        <form class="form-horizontal" id="value-form">
+
+            <div class="form-group">
+                <label for="value-name-input" class="control-label col-lg-2">Name</label>
+
+                <div class="col-lg-5">
+                    <input type="text" id="value-name-input" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="value-desc-input" class="control-label col-lg-2">Description</label>
+
+                <div class="col-lg-5">
+                    <input type="text" id="value-desc-input" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="value-type-input" class="control-label col-lg-2">Type</label>
+
+                <div class="col-lg-5">
+                    <select name="value-type-input" id="value-type-input" class="form-control">
+                        <option value="int" selected>INTEGER</option>
+                        <option value="str">STRING</option>
+                        <option value="bool">BOOLEAN</option>
+                        <option value="datetime">DATETIME</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-lg-offset-1 col-sm-10">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="required-or-default" value="required" checked> Required
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-lg-offset-1 col-sm-2">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="required-or-default" value="default"> Default
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <input type="number" class="form-control" disabled id="default-value-input">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="constraints-input" class="control-label col-lg-2">Constraints</label>
+
+                <div class="col-lg-5">
+                    <input type="text" id="constraints-input" class="form-control">
+                </div>
+            </div>
+
+            <strong>The constraints can be of the following form:</strong> <code>key1==value1&key2==value2&...</code>
+            where <code>key</code> can be:
+            <ul>
+                <li>for <strong>numeric type</strong>: max_val and min_val</li>
+                <li>for <strong>string type</strong>: max_len, min_len and regex</li>
+            </ul>
+            Consult the <a href="/doc">documentation</a> for more details. <br><br>
+
+            <button class="btn btn-success" id="add-value-btn">Add value</button>
+
+        </form>
+
+
+    </div>
+
+    <ul class="text-danger col-lg-offset-3" id="error-list"></ul>
+
+    {% module xsrf_form_html() %}
+
+    <button class="btn btn-success col-lg-offset-3" id="login-button">Create</button>
+
+</form>
+
+<script>
+    $("input[name='required-or-default']").on('click', function (event) {
+        var isDefault = $(this).val() == "default";
+        if (isDefault) {
+            $("#default-value-input").prop("disabled", false);
+        }
+        else {
+            $("#default-value-input").prop("disabled", true);
+        }
+    });
+
+    $("#value-type-input").on('change', function (event) {
+        switch ($(this).val()) {
+            case "int":
+            {
+                $("#default-value-input").attr("type", "number");
+                break;
+            }
+            case "str":
+            {
+                $("#default-value-input").attr("type", "text");
+                break;
+            }
+            case "bool":
+            {
+                $("#default-value-input").attr("type", "checkbox");
+                break;
+            }
+            case "datetime":
+            {
+                $("#default-value-input").attr("type", "datetime-local");
+                break;
+            }
+        }
+    });
+
+    $("#add-new-value-btn").on('click', function (event) {
+        event.preventDefault();
+        var createNewValueForm = $("#add-value-form");
+        var thisButton = $(this);
+        if (createNewValueForm.is(":visible")) {
+            createNewValueForm.hide();
+            thisButton.removeClass("btn-danger");
+            thisButton.addClass("btn-success");
+            thisButton.text("Add new value");
+        }
+        else {
+            createNewValueForm.show();
+            thisButton.removeClass("btn-success");
+            thisButton.addClass("btn-danger");
+            thisButton.text("Cancel");
+        }
+    });
+    $("#add-value-form").hide();
+
+    var buildLiFromValueObject = function (valueObject) {
+        var jsonObject = JSON.stringify(valueObject);
+        var li = "<li data-object='" + btoa(jsonObject) + "'>" + valueObject.name + " (" + valueObject.description + ") of type " +
+                valueObject.type +
+                (valueObject.isRequired ? " required " : (" with default value " + valueObject.defaultValue)) +
+                "</li>";
+        console.log(li);
+        var toReturn = $(li);
+        toReturn.on('click', function () {
+            $(this).detach();
+        });
+        return toReturn;
+    };
+
+    $("#add-value-btn").on('click', function (event) {
+        event.preventDefault();
+        var currentValue = {};
+        currentValue.name = $("#value-name-input").val();
+        currentValue.description = $("#value-desc-input").val();
+        currentValue.type = $("#value-type-input").val();
+        currentValue.isRequired = $("input[name='required-or-default'][value='required']").is(":checked");
+        currentValue.isDefault = $("input[name='required-or-default'][value='default']").is(":checked");
+        currentValue.defaultValue = currentValue.isDefault ? ($("#default-value-input").val()) : null;
+        currentValue.constraints = $("#constraints-input").val();
+
+        $("#values-list").append(buildLiFromValueObject(currentValue));
+        $("#value-form input").val("");
+        $("#add-new-value-btn").click();
+    });
+
+</script>
+
+{% end %}

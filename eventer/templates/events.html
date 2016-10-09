@@ -5,5 +5,15 @@
 
 <h3>Events</h3>
 
+<a href="/create_category">
+    <button class="btn btn-success">Create new event category</button>
+</a>
+
+{% for event in events %}
+
+<h4>{{ event }}</h4>
+
+{% end %}
+
 
 {% end %}

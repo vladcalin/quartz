@@ -67,8 +67,7 @@ class RegisterEndpointHandler(HttpPageHandler):
 
         registered_user = yield self.persist_user(username, password, first_name, last_name, email)
         logging.debug("Registered used: {}".format(registered_user.id))
-        registered_user.session_token = User.generate_session_token()
-        registered_user.save()
+        registered_user.renew_session()
         self.set_secure_cookie("Session", registered_user.session_token)
         self.set_header("Content-Type", "application/json")
         self.write(simplejson.dumps({"success": True}))
@@ -95,11 +94,9 @@ class AuthenticationEndpointHandler(HttpPageHandler):
         password = self.get_body_argument("password")
         is_valid = yield self.validate_username_and_password(username, password)
         if is_valid:
-            new_token = User.generate_session_token()
             target_user = User.objects.get(username=username)
-            target_user.session_token = new_token
-            target_user.save()
-            self.set_secure_cookie("Session", new_token)
+            target_user.renew_session()
+            self.set_secure_cookie("Session", target_user.session_token)
             self.write(simplejson.dumps({"success": True}))
         else:
             self.set_status(403, "Invalid username or password")
@@ -108,7 +105,5 @@ class AuthenticationEndpointHandler(HttpPageHandler):
 class LogoutEndpointHandler(HttpPageHandler):
     @tornado.gen.coroutine
     def post(self):
-        current_user = self.get_current_user()
-        current_user.session_token = None
-        current_user.save()
+        self.get_current_user().invalidate_session()
         self.write(simplejson.dumps({"success": True}))
