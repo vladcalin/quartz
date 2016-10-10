@@ -115,7 +115,7 @@
 
     {% module xsrf_form_html() %}
 
-    <button class="btn btn-success col-lg-offset-3" id="login-button">Create</button>
+    <button class="btn btn-success col-lg-offset-3" id="create-button">Create</button>
 
 </form>
 
@@ -203,6 +203,33 @@
         $("#value-form input").val("");
         $("#add-new-value-btn").click();
     });
+
+    $("#create-button").on('click', function (event) {
+        event.preventDefault();
+
+        var data = {
+            name: $("#name-input").val(),
+            description: $("#desc-input").val(),
+            fields: []
+        };
+
+        var fieldsObjs = $("#values-list li");
+        for (var i = 0; i < fieldsObjs.length; i++) {
+            data.fields.push($(fieldsObjs[i]).data('object'))
+        }
+
+        data._xsrf = $("input[name='_xsrf']").val();
+        $.ajax({
+            url: "/endpoint/create_category",
+            method: "post",
+            data: data,
+            success: function (data) {
+
+            }
+        });
+
+
+    })
 
 </script>
 

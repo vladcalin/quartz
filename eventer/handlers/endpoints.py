@@ -1,11 +1,12 @@
 import logging
+from base64 import b64decode
 
 import bcrypt
 import simplejson
 import tornado.gen
 from mongoengine.errors import NotUniqueError, DoesNotExist
 
-from eventer.handlers.base import HttpPageHandler
+from eventer.handlers.base import HttpPageHandler, AuthenticationRequiredHandler
 from eventer.models import User
 
 
@@ -67,7 +68,8 @@ class RegisterEndpointHandler(HttpPageHandler):
 
         registered_user = yield self.persist_user(username, password, first_name, last_name, email)
         logging.debug("Registered used: {}".format(registered_user.id))
-        registered_user.renew_session()
+        registered_user.session_token = User.generate_session_token()
+        registered_user.save()
         self.set_secure_cookie("Session", registered_user.session_token)
         self.set_header("Content-Type", "application/json")
         self.write(simplejson.dumps({"success": True}))
@@ -94,9 +96,11 @@ class AuthenticationEndpointHandler(HttpPageHandler):
         password = self.get_body_argument("password")
         is_valid = yield self.validate_username_and_password(username, password)
         if is_valid:
+            new_token = User.generate_session_token()
             target_user = User.objects.get(username=username)
-            target_user.renew_session()
-            self.set_secure_cookie("Session", target_user.session_token)
+            target_user.session_token = new_token
+            target_user.save()
+            self.set_secure_cookie("Session", new_token)
             self.write(simplejson.dumps({"success": True}))
         else:
             self.set_status(403, "Invalid username or password")
@@ -105,5 +109,16 @@ class AuthenticationEndpointHandler(HttpPageHandler):
 class LogoutEndpointHandler(HttpPageHandler):
     @tornado.gen.coroutine
     def post(self):
-        self.get_current_user().invalidate_session()
+        current_user = self.get_current_user()
+        current_user.session_token = None
+        current_user.save()
         self.write(simplejson.dumps({"success": True}))
+
+
+class CreateCategoryEndpointHandler(AuthenticationRequiredHandler):
+    @tornado.gen.coroutine
+    def post(self):
+        name = self.get_body_argument("name")
+        description = self.get_body_argument("description")
+        values = [simplejson.loads(b64decode(x.encode()).decode()) for x in self.get_body_arguments("fields[]")]
+       

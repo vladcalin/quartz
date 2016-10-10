@@ -7,7 +7,8 @@ import tornado.log
 
 from eventer.handlers.ui import IndexHandler, DocumentationHandler, LoginHandler, RegisterHandler, EventsHandler, \
     CreateEventCategoryHandler
-from eventer.handlers.endpoints import RegisterEndpointHandler, AuthenticationEndpointHandler, LogoutEndpointHandler
+from eventer.handlers.endpoints import RegisterEndpointHandler, AuthenticationEndpointHandler, LogoutEndpointHandler, \
+    CreateCategoryEndpointHandler
 
 
 def make_app(app_settings):
@@ -24,6 +25,7 @@ def make_app(app_settings):
         (r'/endpoint/register', RegisterEndpointHandler),
         (r'/endpoint/authenticate', AuthenticationEndpointHandler),
         (r'/endpoint/logout', LogoutEndpointHandler),
+        (r'/endpoint/create_category', CreateCategoryEndpointHandler),
 
         # static routes
         (r'/static/(.*)', tornado.web.StaticFileHandler),
