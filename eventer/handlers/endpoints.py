@@ -121,4 +121,5 @@ class CreateCategoryEndpointHandler(AuthenticationRequiredHandler):
         name = self.get_body_argument("name")
         description = self.get_body_argument("description")
         values = [simplejson.loads(b64decode(x.encode()).decode()) for x in self.get_body_arguments("fields[]")]
-       
+
+

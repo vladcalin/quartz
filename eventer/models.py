@@ -82,6 +82,16 @@ class EventCategory(Document):
         ]
     }
 
+    def field_is_valid(self, field_dict):
+        for req_field in ["name", "description", "type", "constraints"]:
+            if req_field not in field_dict:
+                raise ValueError("Field {} does not contain the key {}".format(field_dict, req_field))
+
+        if not field_dict["name"]:
+            raise ValueError("Field 'name' is mandatory")
+
+
+
 
 class Event(Document):
     category = ReferenceField(EventCategory, null=False)
