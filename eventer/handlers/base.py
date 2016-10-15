@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlencode
 
 import tornado.httpserver
 import tornado.ioloop
@@ -36,7 +37,7 @@ class AuthenticationRequiredHandler(DefaultContextRequestHandler):
 
     def prepare(self):
         if not self.get_current_user():
-            self.redirect("/login")
+            self.redirect("/login?{}".format(urlencode({"next": self.request.uri})))
 
 
 class HttpPageHandler(DefaultContextRequestHandler):

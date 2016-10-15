@@ -3,78 +3,97 @@
 
 {% block "content" %}
 
-<h3>Login</h3>
+    {% if not current_user %}
 
-<form action="/endpoint/authenticate" method="post" class="form-horizontal">
+        <h3>Login</h3>
 
-    <div class="form-group">
-        <label for="username-input" class="control-label col-lg-3">Username</label>
+        <form action="/endpoint/authenticate" method="post" class="form-horizontal">
 
-        <div class="col-lg-5">
-            <input type="text" id="username-input" class="form-control">
-        </div>
-    </div>
+            <div class="form-group">
+                <label for="username-input" class="control-label col-lg-3">Username</label>
 
-    <div class="form-group">
-        <label for="password-input" class="control-label col-lg-3">Password</label>
+                <div class="col-lg-5">
+                    <input type="text" id="username-input" class="form-control">
+                </div>
+            </div>
 
-        <div class="col-lg-5">
-            <input type="password" id="password-input" class="form-control">
-        </div>
-    </div>
+            <div class="form-group">
+                <label for="password-input" class="control-label col-lg-3">Password</label>
 
-    <ul class="text-danger col-lg-offset-3" id="error-list">
+                <div class="col-lg-5">
+                    <input type="password" id="password-input" class="form-control">
+                </div>
+            </div>
 
-    </ul>
+            <ul class="text-danger col-lg-offset-3" id="error-list">
 
-    {% module xsrf_form_html() %}
+            </ul>
 
-    <button class="btn btn-primary col-lg-offset-3" id="login-button">Login</button>
+            {% module xsrf_form_html() %}
 
-</form>
+            <button class="btn btn-primary col-lg-offset-3" id="login-button">Login</button>
 
-<script>
-    $("#login-button").on("click", function (e) {
-        e.preventDefault();
-        var username = $("#username-input").val();
-        var password = $("#password-input").val();
-        var xsrf = $("input[name='_xsrf']").val();
+        </form>
 
-        var errorList = $("#error-list");
-        errorList.empty();
-
-        if (username == "") {
-            errorList.append("<li>" + "Username required" + "</li>")
-        }
-
-        if (password == "") {
-            errorList.append("<li>" + "Password required" + "</li>")
-        }
-
-        if (errorList.children().length != 0) {
-            return;
-        }
-
-        $.ajax({
-            url: "/endpoint/authenticate",
-            method: "post",
-            data: {
-                username: username,
-                password: password,
-                _xsrf: xsrf
-            },
-            success: function (data) {
-                var dataJson = JSON.parse(data);
-                if (dataJson.success) {
-                    window.location.href = "/";
+        <script>
+            function getNextLocation() {
+                var query = window.location.search.substring(1);
+                var vars = query.split("&");
+                for (var i = 0; i < vars.length; i++) {
+                    var pair = vars[i].split("=");
+                    if (pair[0] == "next") {
+                        return decodeURIComponent(pair[1]);
+                    }
                 }
-            },
-            error: function (code, msg, error) {
-                errorList.append("<li>" + msg + "</li>");
+                return "/";
             }
-        });
 
-    });
-</script>
+            $("#login-button").on("click", function (e) {
+                e.preventDefault();
+                var username = $("#username-input").val();
+                var password = $("#password-input").val();
+                var xsrf = $("input[name='_xsrf']").val();
+
+                var errorList = $("#error-list");
+                errorList.empty();
+
+                if (username == "") {
+                    errorList.append("<li>" + "Username required" + "</li>")
+                }
+
+                if (password == "") {
+                    errorList.append("<li>" + "Password required" + "</li>")
+                }
+
+                if (errorList.children().length != 0) {
+                    return;
+                }
+
+                $.ajax({
+                    url: "/endpoint/authenticate",
+                    method: "post",
+                    data: {
+                        username: username,
+                        password: password,
+                        _xsrf: xsrf
+                    },
+                    success: function (data) {
+                        var dataJson = JSON.parse(data);
+                        if (dataJson.success) {
+                            window.location.href = getNextLocation();
+                        }
+                    },
+                    error: function (code, msg, error) {
+                        errorList.append("<li>" + msg + "</li>");
+                    }
+                });
+
+            });
+        </script>
+
+    {% else %}
+        <p class="text-danger">Already logged in.</p>
+    {% end %}
 
 {% end %}
+
