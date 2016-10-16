@@ -8,6 +8,7 @@ import tornado.web
 from mongoengine.errors import DoesNotExist
 
 from eventer.models import User
+import eventer.settings
 
 
 class DefaultContextRequestHandler(tornado.web.RequestHandler):
@@ -27,12 +28,17 @@ class DefaultContextRequestHandler(tornado.web.RequestHandler):
                 return instance
 
     def get_default_context(self):
-        return {}
+        """
+        Returns a dict that represent a default context for all rendered templates
+        (Routes defined in :py:mod:`eventer.handlers.ui`)
+        :return: dict
+        """
+        return {"settings": eventer.settings}
 
 
 class AuthenticationRequiredHandler(DefaultContextRequestHandler):
     """
-    Class for defining routes that need authentication - valid auth token stored in database
+    Class for defining routes that need authentication - valid session token stored in database
     """
 
     def prepare(self):
@@ -48,4 +54,19 @@ class HttpPageHandler(DefaultContextRequestHandler):
 
 
 class ApiHandler(DefaultContextRequestHandler):
-    pass
+    """
+    Class for defining routes that can be accessed by 3rd party clients or scripts. They must contain a valid value for
+    the :py:data:`eventer.settings.API_REQUIRED_HEADER` header.
+    """
+
+    def get_current_user(self):
+        req_header = self.request.headers.get(eventer.settings.API_REQUIRED_HEADER, None)
+        if not req_header:
+            return
+
+        try:
+            user = User.objects.get(id=req_header)
+        except DoesNotExist:
+            return
+        else:
+            return user

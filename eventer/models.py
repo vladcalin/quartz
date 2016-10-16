@@ -112,6 +112,16 @@ class EventCategory(Document):
                 raise CategoryValidationError(
                     "Constraint {} not allowed for type {}".format(constraint, field_dict["type"]))
 
+    def get_payload_template(self):
+        parts = ["category={}".format(self.id)]
+        for field in self.fields:
+            value = field["name"] + "=<" + field["type"] + ">"
+            if "default" in field["constraints"]:
+                value = "[" + value + "]"
+            parts.append(value)
+        return "&".join(parts)
+
+
 
 class Event(Document):
     category = ReferenceField(EventCategory, null=False)

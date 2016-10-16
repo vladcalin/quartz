@@ -11,23 +11,44 @@
 
 <table class="table table-hover">
     <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-        </tr>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Description</th>
+    </tr>
     </thead>
     <tbody>
-    {% for event in events %}
-        <tr>
-            <td>{{ event.id }}</td>
-            <td>{{ event.name }}</td>
-            <td>{{ event.description }}</td>
-            <td>
-                <button class="btn btn-default">View events</button>
-                <button class="btn btn-primary">Manage</button>
-            </td>
-        </tr>
+    {% for category in events %}
+    <tr>
+        <td>{{ category.id }}</td>
+        <td>{{ category.name }}</td>
+        <td>{{ category.description }}</td>
+        <td>
+            <button class="btn btn-default">View events</button>
+            <button class="btn btn-primary">Manage</button>
+            <button class="btn btn-success" onclick="$('#data-panel-{{ category.id }}').toggle();">View quick info
+            </button>
+        </td>
+    </tr>
+    <tr id="data-panel-{{ category.id }}" hidden>
+        <td colspan="4">
+            In order to register a new event, make a HTTP <code>POST</code> request at
+            <ul>
+                <li><code>{{ request.protocol }}://{{ request.host }}/api/register_event</code> with the payload of
+                    <code>{{ category.get_payload_template() }}</code>
+                </li>
+            </ul>
+            <div class="panel panel-info">
+                <div class="panel-body">
+                    Note that the values enclosed in <code>[</code> and <code>]</code> are not required and will be
+                    replaced with the designated default values. To edit them, go to the <strong>Manage</strong> page.
+                    <br>
+                    Also, if you make the requests manually, you must include the <code>{{ settings.API_REQUIRED_HEADER }}</code> header
+                    with the proper value. Read more in <a href="/doc">documentation</a>
+                </div>
+            </div>
+        </td>
+    </tr>
     {% end %}
     </tbody>
 </table>

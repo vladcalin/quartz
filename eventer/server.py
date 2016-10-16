@@ -9,6 +9,7 @@ from eventer.handlers.ui import IndexHandler, DocumentationHandler, LoginHandler
     CreateEventCategoryHandler
 from eventer.handlers.endpoints import RegisterEndpointHandler, AuthenticationEndpointHandler, LogoutEndpointHandler, \
     CreateCategoryEndpointHandler
+from eventer.handlers.api import RegisterEventApiHandler
 
 
 def make_app(app_settings):
@@ -31,6 +32,7 @@ def make_app(app_settings):
         (r'/static/(.*)', tornado.web.StaticFileHandler),
 
         # api routes
+        (r'/api/register_event', RegisterEventApiHandler)
     ], **app_settings)
 
 
