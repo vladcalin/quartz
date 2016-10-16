@@ -31,7 +31,7 @@ class RegisterHandler(HttpPageHandler):
 class EventsHandler(AuthenticationRequiredHandler):
     @tornado.gen.coroutine
     def get(self):
-        events = EventCategory.objects.filter(user=self.get_current_user())
+        events = EventCategory.objects.filter(user=self.current_user)
         self.render("events.html", events=events, **self.get_default_context())
 
 

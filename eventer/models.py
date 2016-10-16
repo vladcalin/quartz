@@ -3,7 +3,9 @@ import datetime
 import uuid
 
 from mongoengine import connect, Document, StringField, IntField, BooleanField, BinaryField, DateTimeField, \
-    ReferenceField, DictField
+    ReferenceField, DictField, ListField
+
+from eventer.errors import CategoryValidationError
 
 connect(db="eventer", host="127.0.0.1", port=27017)
 
@@ -43,13 +45,12 @@ class EventCategory(Document):
         NUMERIC = "int"
         STRING = "str"
         BOOLEAN = "bool"
-        DATETIME = "datetime"
 
-        ALL = [NUMERIC, STRING, BOOLEAN, DATETIME]
+        ALL = [NUMERIC, STRING, BOOLEAN]
 
     class FieldConstraint:
         # universal
-        REQUIRED = "req"
+        REQUIRED = "required"
         DEFAULT = "default"
 
         # int
@@ -60,6 +61,16 @@ class EventCategory(Document):
         MIN_LENGTH = "min_len"
         MAX_LENGTH = "max_len"
         REGEX = "regex"
+
+    _generic_constraints = [FieldConstraint.DEFAULT, FieldConstraint.REQUIRED]
+
+    _allowed_constraints = {
+        FieldType.NUMERIC: _generic_constraints + [FieldConstraint.MIN_VALUE,
+                                                   FieldConstraint.MAX_VALUE],
+        FieldType.STRING: _generic_constraints + [FieldConstraint.MIN_LENGTH,
+                                                  FieldConstraint.MAX_LENGTH, FieldConstraint.REGEX],
+        FieldType.BOOLEAN: _generic_constraints
+    }
 
     name = StringField(unique=True)
     description = StringField()
@@ -74,7 +85,7 @@ class EventCategory(Document):
                 constraints: ...
             }
     """
-    fields = DictField(required=True)
+    fields = ListField(required=True)
 
     meta = {
         "fields": [
@@ -82,7 +93,8 @@ class EventCategory(Document):
         ]
     }
 
-    def field_is_valid(self, field_dict):
+    @classmethod
+    def field_is_valid(cls, field_dict):
         for req_field in ["name", "description", "type", "constraints"]:
             if req_field not in field_dict:
                 raise ValueError("Field {} does not contain the key {}".format(field_dict, req_field))
@@ -90,7 +102,15 @@ class EventCategory(Document):
         if not field_dict["name"]:
             raise ValueError("Field 'name' is mandatory")
 
+        cls.check_constraints_validity(field_dict)
 
+    @classmethod
+    def check_constraints_validity(cls, field_dict):
+        for constraint in field_dict["constraints"]:
+            logging.error(constraint)
+            if constraint not in cls._allowed_constraints[field_dict["type"]]:
+                raise CategoryValidationError(
+                    "Constraint {} not allowed for type {}".format(constraint, field_dict["type"]))
 
 
 class Event(Document):

@@ -1,5 +1,6 @@
 import logging
 from base64 import b64decode
+from urllib.parse import parse_qs
 
 import bcrypt
 import simplejson
@@ -7,7 +8,8 @@ import tornado.gen
 from mongoengine.errors import NotUniqueError, DoesNotExist
 
 from eventer.handlers.base import HttpPageHandler, AuthenticationRequiredHandler
-from eventer.models import User
+from eventer.models import User, EventCategory
+from eventer.errors import CategoryValidationError
 
 
 class RegisterEndpointHandler(HttpPageHandler):
@@ -122,4 +124,17 @@ class CreateCategoryEndpointHandler(AuthenticationRequiredHandler):
         description = self.get_body_argument("description")
         values = [simplejson.loads(b64decode(x.encode()).decode()) for x in self.get_body_arguments("fields[]")]
 
+        for value in values:
+            parsed = parse_qs(value["constraints"])
+            value["constraints"] = {k: parsed[k][0] for k in parsed}
 
+        try:
+            for field in values:
+                EventCategory.field_is_valid(field)
+        except CategoryValidationError as e:
+            logging.error(e)
+            self.write(simplejson.dumps({"success": False, "error": str(e)}))
+        else:
+            category = EventCategory(name=name, description=description, user=self.current_user, fields=values)
+            category.save()
+            self.write(simplejson.dumps({"success": True, "id": str(category.id)}))

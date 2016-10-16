@@ -59,7 +59,6 @@
                         <option value="int" selected>INTEGER</option>
                         <option value="str">STRING</option>
                         <option value="bool">BOOLEAN</option>
-                        <option value="datetime">DATETIME</option>
                     </select>
                 </div>
             </div>
@@ -174,11 +173,11 @@
     });
     $("#add-value-form").hide();
 
-    var buildLiFromValueObject = function (valueObject) {
+    var buildLiFromValueObject = function (valueObject, isRequired, defaultValue) {
         var jsonObject = JSON.stringify(valueObject);
         var li = "<li data-object='" + btoa(jsonObject) + "'>" + valueObject.name + " (" + valueObject.description + ") of type " +
                 valueObject.type +
-                (valueObject.isRequired ? " required " : (" with default value " + valueObject.defaultValue)) +
+                (isRequired ? " required " : (" with default value " + defaultValue)) +
                 "</li>";
         console.log(li);
         var toReturn = $(li);
@@ -194,18 +193,29 @@
         currentValue.name = $("#value-name-input").val();
         currentValue.description = $("#value-desc-input").val();
         currentValue.type = $("#value-type-input").val();
-        currentValue.isRequired = $("input[name='required-or-default'][value='required']").is(":checked");
-        currentValue.isDefault = $("input[name='required-or-default'][value='default']").is(":checked");
-        currentValue.defaultValue = currentValue.isDefault ? ($("#default-value-input").val()) : null;
+        var isRequired = $("input[name='required-or-default'][value='required']").is(":checked");
+        var isDefault = $("input[name='required-or-default'][value='default']").is(":checked");
+        var defaultValue = isDefault ? ($("#default-value-input").val()) : null;
         currentValue.constraints = $("#constraints-input").val();
 
-        $("#values-list").append(buildLiFromValueObject(currentValue));
+        if (isRequired) {
+            currentValue.constraints += "&required=true";
+        }
+        if (isDefault) {
+            currentValue.constraints += "&default=" + encodeURIComponent(defaultValue);
+        }
+        if (currentValue.constraints.lastIndexOf("&", 0) === 0) {
+            currentValue.constraints = currentValue.constraints.substr(1);
+        }
+
+        $("#values-list").append(buildLiFromValueObject(currentValue, isRequired, defaultValue));
         $("#value-form input").val("");
         $("#add-new-value-btn").click();
     });
 
     $("#create-button").on('click', function (event) {
         event.preventDefault();
+        $("#error-list").empty();
 
         var data = {
             name: $("#name-input").val(),
@@ -224,7 +234,14 @@
             method: "post",
             data: data,
             success: function (data) {
-
+                data = JSON.parse(data);
+                if (data.success) {
+                    window.location.href = "/events";
+                }
+                else {
+                    console.log(data);
+                    $("#error-list").append("<li>" + data.error + "</li>");
+                }
             }
         });
 

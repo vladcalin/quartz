@@ -9,11 +9,27 @@
     <button class="btn btn-success">Create new event category</button>
 </a>
 
-{% for event in events %}
-
-<h4>{{ event }}</h4>
-
-{% end %}
-
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for event in events %}
+        <tr>
+            <td>{{ event.id }}</td>
+            <td>{{ event.name }}</td>
+            <td>{{ event.description }}</td>
+            <td>
+                <button class="btn btn-default">View events</button>
+                <button class="btn btn-primary">Manage</button>
+            </td>
+        </tr>
+    {% end %}
+    </tbody>
+</table>
 
 {% end %}
