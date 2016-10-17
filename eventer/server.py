@@ -6,10 +6,11 @@ import tornado.web
 import tornado.log
 
 from eventer.handlers.ui import IndexHandler, DocumentationHandler, LoginHandler, RegisterHandler, EventsHandler, \
-    CreateEventCategoryHandler
+    CreateEventCategoryHandler, UserProfileHandler
 from eventer.handlers.endpoints import RegisterEndpointHandler, AuthenticationEndpointHandler, LogoutEndpointHandler, \
     CreateCategoryEndpointHandler
 from eventer.handlers.api import RegisterEventApiHandler
+from eventer.settings import SERVER_HOST, SERVER_PORT
 
 
 def make_app(app_settings):
@@ -21,6 +22,7 @@ def make_app(app_settings):
         (r'/register', RegisterHandler),
         (r'/events', EventsHandler),
         (r'/create_category', CreateEventCategoryHandler),
+        (r'/profile', UserProfileHandler),
 
         # endpoints
         (r'/endpoint/register', RegisterEndpointHandler),
@@ -46,6 +48,6 @@ if __name__ == '__main__':
     tornado.log.enable_pretty_logging()
 
     server = tornado.httpserver.HTTPServer(make_app(settings))
-    server.bind(8888)
+    server.bind(SERVER_PORT)
     server.start()
     tornado.ioloop.IOLoop.current().start()

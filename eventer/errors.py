@@ -14,3 +14,7 @@ class EventerValidationError(EventerError):
 
 class CategoryValidationError(EventerValidationError):
     pass
+
+
+class FieldNotFoundError(EventerError):
+    pass

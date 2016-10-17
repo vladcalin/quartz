@@ -5,7 +5,8 @@ import uuid
 from mongoengine import connect, Document, StringField, IntField, BooleanField, BinaryField, DateTimeField, \
     ReferenceField, DictField, ListField
 
-from eventer.errors import CategoryValidationError
+from eventer.errors import CategoryValidationError, FieldNotFoundError
+from eventer.util import generate_uuid_token
 
 connect(db="eventer", host="127.0.0.1", port=27017)
 
@@ -20,6 +21,7 @@ class User(Document):
     date_joined = DateTimeField(default=datetime.datetime.now)
 
     session_token = StringField()
+    api_token = StringField(unique=True, default=generate_uuid_token)
 
     meta = {
         "indexes": [
@@ -27,17 +29,20 @@ class User(Document):
         ]
     }
 
-    @staticmethod
-    def generate_session_token():
-        return str(uuid.uuid4())
-
     def renew_session(self):
-        self.session_token = self.generate_session_token()
+        self.session_token = generate_uuid_token()
         self.save()
 
     def invalidate_session(self):
         self.session_token = None
         self.save()
+
+    def count_categories(self):
+        return EventCategory.objects.filter(user=self).count()
+
+    def count_events(self):
+        categories = EventCategory.objects.filter(user=self)
+        return sum([Event.objects.filter(category=cat.id).count() for cat in categories])
 
 
 class EventCategory(Document):
@@ -122,11 +127,7 @@ class EventCategory(Document):
         return "&".join(parts)
 
 
-
 class Event(Document):
     category = ReferenceField(EventCategory, null=False)
     timestamp = DateTimeField(default=datetime.datetime.now)
     values = DictField()
-
-    def validate_values(self):
-        pass

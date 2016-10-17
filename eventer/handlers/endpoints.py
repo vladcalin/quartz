@@ -10,6 +10,7 @@ from mongoengine.errors import NotUniqueError, DoesNotExist
 from eventer.handlers.base import HttpPageHandler, AuthenticationRequiredHandler
 from eventer.models import User, EventCategory
 from eventer.errors import CategoryValidationError
+from eventer.util import generate_uuid_token
 
 
 class RegisterEndpointHandler(HttpPageHandler):
@@ -70,7 +71,7 @@ class RegisterEndpointHandler(HttpPageHandler):
 
         registered_user = yield self.persist_user(username, password, first_name, last_name, email)
         logging.debug("Registered used: {}".format(registered_user.id))
-        registered_user.session_token = User.generate_session_token()
+        registered_user.session_token = generate_uuid_token()
         registered_user.save()
         self.set_secure_cookie("Session", registered_user.session_token)
         self.set_header("Content-Type", "application/json")
@@ -98,7 +99,7 @@ class AuthenticationEndpointHandler(HttpPageHandler):
         password = self.get_body_argument("password")
         is_valid = yield self.validate_username_and_password(username, password)
         if is_valid:
-            new_token = User.generate_session_token()
+            new_token = generate_uuid_token()
             target_user = User.objects.get(username=username)
             target_user.session_token = new_token
             target_user.save()

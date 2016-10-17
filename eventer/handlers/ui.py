@@ -39,3 +39,9 @@ class CreateEventCategoryHandler(AuthenticationRequiredHandler):
     @tornado.gen.coroutine
     def get(self):
         self.render("create_event_category.html", **self.get_default_context())
+
+
+class UserProfileHandler(AuthenticationRequiredHandler):
+    @tornado.gen.coroutine
+    def get(self):
+        self.render("profile.html", **self.get_default_context())

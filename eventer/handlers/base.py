@@ -65,7 +65,7 @@ class ApiHandler(DefaultContextRequestHandler):
             return
 
         try:
-            user = User.objects.get(id=req_header)
+            user = User.objects.get(api_token=req_header)
         except DoesNotExist:
             return
         else:
