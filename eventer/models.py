@@ -1,12 +1,14 @@
 import logging
 import datetime
 import uuid
+import bcrypt
 
 from mongoengine import connect, Document, StringField, IntField, BooleanField, BinaryField, DateTimeField, \
-    ReferenceField, DictField, ListField
+    ReferenceField, DictField, ListField, ValidationError, EmailField, EmbeddedDocument, EmbeddedDocumentListField
 
 from eventer.errors import CategoryValidationError, FieldNotFoundError
 from eventer.util import generate_uuid_token
+from eventer.constraints import constraint_str_length_max, constraint_str_length_min, constraint_str_regex
 
 connect(db="eventer", host="127.0.0.1", port=27017)
 
@@ -15,7 +17,7 @@ class User(Document):
     username = StringField(unique=True)
     first_name = StringField()
     last_name = StringField()
-    email = StringField(unique=True)
+    email = EmailField(unique=True)
     password = BinaryField()
     active = BooleanField(default=True)
     date_joined = DateTimeField(default=datetime.datetime.now)
@@ -44,87 +46,60 @@ class User(Document):
         categories = EventCategory.objects.filter(user=self)
         return sum([Event.objects.filter(category=cat.id).count() for cat in categories])
 
+    def set_password(self, password):
+        if isinstance(password, str):
+            password = password.encode()
+        self.password = bcrypt.hashpw(password, bcrypt.gensalt())
 
-class EventCategory(Document):
-    class FieldType:
-        NUMERIC = "int"
-        STRING = "str"
-        BOOLEAN = "bool"
+    def verify_password(self, password):
+        if isinstance(password, str):
+            password = password.encode()
+        return bcrypt.checkpw(password, self.password)
 
-        ALL = [NUMERIC, STRING, BOOLEAN]
 
-    class FieldConstraint:
-        # universal
-        REQUIRED = "required"
-        DEFAULT = "default"
+class EventFieldConstraint(EmbeddedDocument):
+    class Names:
+        str_len_min = "str_len_min"
+        str_len_max = "str_len_max"
+        str_regex = "str_regex"
 
-        # int
-        MAX_VALUE = "max_val"
-        MIN_VALUE = "min_val"
-
-        # str
-        MIN_LENGTH = "min_len"
-        MAX_LENGTH = "max_len"
-        REGEX = "regex"
-
-    _generic_constraints = [FieldConstraint.DEFAULT, FieldConstraint.REQUIRED]
-
-    _allowed_constraints = {
-        FieldType.NUMERIC: _generic_constraints + [FieldConstraint.MIN_VALUE,
-                                                   FieldConstraint.MAX_VALUE],
-        FieldType.STRING: _generic_constraints + [FieldConstraint.MIN_LENGTH,
-                                                  FieldConstraint.MAX_LENGTH, FieldConstraint.REGEX],
-        FieldType.BOOLEAN: _generic_constraints
+    _supported = {
+        Names.str_len_min: constraint_str_length_min,
+        Names.str_len_max: constraint_str_length_max,
+        Names.str_regex: constraint_str_regex
     }
 
+    type = StringField(choices=tuple(_supported.keys()))
+    parameters = ListField()
+
+    def check(self, value):
+        func = self._supported.get(self.type)
+        return func(value, *list(self.parameters))
+
+
+class EventField(EmbeddedDocument):
+    INTEGER = 0
+    STRING = 1
+    BOOLEAN = 2
+
+    name = StringField()
+    description = StringField()
+    type = IntField(choices=(INTEGER, STRING, BOOLEAN))
+    constraints = EmbeddedDocumentListField(EventFieldConstraint)
+
+
+class EventCategory(Document):
     name = StringField(unique=True)
     description = StringField()
     user = ReferenceField(User)
 
-    """
-        Field specification will be kept in the following form:
-            {
-                name: ...,
-                description: ...,
-                type: ...,
-                constraints: ...
-            }
-    """
-    fields = ListField(required=True)
+    fields = EmbeddedDocumentListField(EventField)
 
     meta = {
         "fields": [
             "#user"
         ]
     }
-
-    @classmethod
-    def field_is_valid(cls, field_dict):
-        for req_field in ["name", "description", "type", "constraints"]:
-            if req_field not in field_dict:
-                raise ValueError("Field {} does not contain the key {}".format(field_dict, req_field))
-
-        if not field_dict["name"]:
-            raise ValueError("Field 'name' is mandatory")
-
-        cls.check_constraints_validity(field_dict)
-
-    @classmethod
-    def check_constraints_validity(cls, field_dict):
-        for constraint in field_dict["constraints"]:
-            logging.error(constraint)
-            if constraint not in cls._allowed_constraints[field_dict["type"]]:
-                raise CategoryValidationError(
-                    "Constraint {} not allowed for type {}".format(constraint, field_dict["type"]))
-
-    def get_payload_template(self):
-        parts = ["category={}".format(self.id)]
-        for field in self.fields:
-            value = field["name"] + "=<" + field["type"] + ">"
-            if "default" in field["constraints"]:
-                value = "[" + value + "]"
-            parts.append(value)
-        return "&".join(parts)
 
 
 class Event(Document):

@@ -29,7 +29,7 @@ class RegisterEndpointHandler(HttpPageHandler):
     def persist_user(self, username, password, first_name, last_name, email):
         user_instance = User()
         user_instance.username = username
-        user_instance.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        user_instance.set_password(password)
         user_instance.first_name = first_name
         user_instance.last_name = last_name
         user_instance.email = email
