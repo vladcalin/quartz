@@ -1,72 +1,46 @@
-import logging
-from urllib.parse import urlencode
-
-import tornado.httpserver
-import tornado.ioloop
+# coding=utf-8
 import tornado.web
+from tornado.escape import json_decode, json_encode
 
-from mongoengine.errors import DoesNotExist
-
-from eventer.models import User
-import eventer.settings
+from eventer.settings import EVENTER_TOKEN_HEADER
 
 
-class DefaultContextRequestHandler(tornado.web.RequestHandler):
-    def get_current_user(self):
-        session_cookie = self.get_secure_cookie("Session")
-        # no session cookie is set
-        if not session_cookie:
-            return None
+class GenericApiHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Content-Type", "application/json")
+
+    def write_json(self, to_return):
+        self.write(json_encode(to_return))
+
+    def get_request_body_as_json(self):
+        return json_decode(self.request.body)
+
+    def write_error(self, status_code, **kwargs):
+        self.set_status(status_code)
+
+        exc_class, exc, tb = kwargs.get("exc_info")
+
+        if hasattr(exc, "log_message"):
+            info = exc.log_message
         else:
-            session_cookie = session_cookie.decode()
-            try:
-                instance = User.objects.get(session_token=session_cookie)
-            except DoesNotExist:
-                # invalid session cookie
-                return None
-            else:
-                return instance
+            info = str(exc)
 
-    def get_default_context(self):
-        """
-        Returns a dict that represent a default context for all rendered templates
-        (Routes defined in :py:mod:`eventer.handlers.ui`)
-        :return: dict
-        """
-        return {"settings": eventer.settings}
+        self.write_json({
+            "status": status_code,
+            "info": info
+        })
 
 
-class AuthenticationRequiredHandler(DefaultContextRequestHandler):
-    """
-    Class for defining routes that need authentication - valid session token stored in database
-    """
-
-    def prepare(self):
-        if not self.get_current_user():
-            self.redirect("/login?{}".format(urlencode({"next": self.request.uri})))
-
-
-class HttpPageHandler(DefaultContextRequestHandler):
-    """
-    Class for defining routes that do not need authentication and are public
-    """
+class ErrorHandler(GenericApiHandler, tornado.web.ErrorHandler):
     pass
 
 
-class ApiHandler(DefaultContextRequestHandler):
-    """
-    Class for defining routes that can be accessed by 3rd party clients or scripts. They must contain a valid value for
-    the :py:data:`eventer.settings.API_REQUIRED_HEADER` header.
-    """
+class PublicApiHandler(GenericApiHandler):
+    pass
 
+
+class PrivateApiHandler(GenericApiHandler):
     def get_current_user(self):
-        req_header = self.request.headers.get(eventer.settings.API_REQUIRED_HEADER, None)
-        if not req_header:
+        auth_token = self.request.headers.get(EVENTER_TOKEN_HEADER, None)
+        if not auth_token:
             return
-
-        try:
-            user = User.objects.get(api_token=req_header)
-        except DoesNotExist:
-            return
-        else:
-            return user

@@ -18,8 +18,7 @@ class ObjectCreationTestCase(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        pass
-        # cls._test_user.delete()
+        cls._test_user.delete()
 
     def test_event_category_creation(self):
         category = EventCategory()
