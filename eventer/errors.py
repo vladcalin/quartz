@@ -18,3 +18,11 @@ class CategoryValidationError(EventerValidationError):
 
 class FieldNotFoundError(EventerError):
     pass
+
+
+class FatalErrorThatShouldNeverHappen(EventerError):
+    pass
+
+
+class InvalidValueError(EventerError):
+    pass

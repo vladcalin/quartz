@@ -8,7 +8,7 @@ import tornado.web
 from tornado.escape import json_decode
 import bcrypt
 
-from eventer.handlers.base import PublicApiHandler
+from eventer.handlers.base import PublicApiHandler, PrivateApiHandler
 from eventer.models import User
 
 _executor = ThreadPoolExecutor(8)
@@ -43,7 +43,7 @@ class UserCreationApiHandler(PublicApiHandler):
     def persist_user(self, username, password, email, first_name, last_name):
         user = User()
         user.username = username
-        user.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        user.set_password(password)
         user.email = email
         user.first_name = first_name
         user.last_name = last_name
@@ -68,7 +68,8 @@ class UserCreationApiHandler(PublicApiHandler):
 
         user_instance = yield _executor.submit(self.persist_user,
                                                username, password, email, first_name, last_name)
-        self.write_json(user_instance)
+        user_instance.generate_api_token()
+        self.write_json(user_instance.to_dict())
 
     def check_request_parameters(self, post_data):
         errors = []
@@ -78,3 +79,16 @@ class UserCreationApiHandler(PublicApiHandler):
         if errors:
             raise tornado.web.HTTPError(400, log_message="The following parameters are missing: {}".format(
                 ", ".join(errors)))
+
+
+class CreateNewTokenHandler(PrivateApiHandler):
+    def post(self):
+        self.current_user.generate_api_token()
+        self.write_json(self.current_user.to_dict())
+
+
+class RevokeTokenHandler(PrivateApiHandler):
+    def post(self):
+        token = self.get_request_body_as_json()["token"]
+        self.current_user.revoke_api_token(token)
+        self.write_json(self.current_user.to_dict())

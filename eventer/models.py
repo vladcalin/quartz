@@ -7,7 +7,7 @@ from mongoengine import connect, Document, StringField, IntField, BooleanField, 
     ReferenceField, DictField, ListField, ValidationError, EmailField, EmbeddedDocument, EmbeddedDocumentListField, \
     UUIDField
 
-from eventer.errors import CategoryValidationError, FieldNotFoundError
+from eventer.errors import CategoryValidationError, FieldNotFoundError, InvalidValueError
 from eventer.util import generate_uuid_token
 from eventer.constraints import constraint_str_length_max, constraint_str_length_min, constraint_str_regex
 
@@ -16,6 +16,19 @@ connect(db="eventer", host="127.0.0.1", port=27017)
 
 class ApiToken(EmbeddedDocument):
     token = UUIDField(unique=True, default=uuid.uuid4)
+    created = DateTimeField(default=datetime.datetime.now)
+
+    def to_dict(self):
+        return {
+            "token": str(self.token),
+            "created": str(self.created)
+        }
+
+    def __eq__(self, other):
+        if not isinstance(other, ApiToken):
+            return False
+
+        return str(self.token) == str(other.token)
 
 
 class User(Document):
@@ -27,22 +40,25 @@ class User(Document):
     active = BooleanField(default=True)
     date_joined = DateTimeField(default=datetime.datetime.now)
 
-    session_token = StringField()
     api_tokens = EmbeddedDocumentListField(ApiToken)
 
     meta = {
         "indexes": [
-            "#session_token"
+            "api_tokens.token"
         ]
     }
 
-    def renew_session(self):
-        self.session_token = generate_uuid_token()
+    def generate_api_token(self):
+        new_api_token = generate_uuid_token()
+        self.api_tokens.append(ApiToken(token=new_api_token))
         self.save()
 
-    def invalidate_session(self):
-        self.session_token = None
-        self.save()
+    def revoke_api_token(self, token):
+        try:
+            self.api_tokens.remove(ApiToken(token=token))
+            self.save()
+        except ValueError:
+            raise InvalidValueError("Invalid API token parameter")
 
     def count_categories(self):
         return EventCategory.objects.filter(user=self).count()
@@ -60,6 +76,16 @@ class User(Document):
         if isinstance(password, str):
             password = password.encode()
         return bcrypt.checkpw(password, self.password)
+
+    def to_dict(self):
+        return {
+            "username": self.username,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "date_joined": str(self.date_joined),
+            "api_tokens": [x.to_dict() for x in self.api_tokens]
+        }
 
 
 class EventFieldConstraint(EmbeddedDocument):
