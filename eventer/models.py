@@ -5,7 +5,7 @@ import bcrypt
 
 from mongoengine import connect, Document, StringField, IntField, BooleanField, BinaryField, DateTimeField, \
     ReferenceField, DictField, ListField, ValidationError, EmailField, EmbeddedDocument, EmbeddedDocumentListField, \
-    UUIDField
+    UUIDField, DoesNotExist
 
 from eventer.errors import CategoryValidationError, FieldNotFoundError, InvalidValueError
 from eventer.util import generate_uuid_token
@@ -60,6 +60,23 @@ class User(Document):
         except ValueError:
             raise InvalidValueError("Invalid API token parameter")
 
+    def create_new_session(self):
+        session = Session(user=self)
+        session.save()
+        return session
+
+    def revoke_session(self, token):
+        if isinstance(token, bytes):
+            token = token.decode()
+        try:
+            session = Session.objects.get(token=token)
+            if session.user.id != self.id:
+                raise ValueError("Not your session")
+        except DoesNotExist:
+            raise ValueError("Not a valid session: {}".format(token))
+        else:
+            session.delete()
+
     def count_categories(self):
         return EventCategory.objects.filter(user=self).count()
 
@@ -86,6 +103,11 @@ class User(Document):
             "date_joined": str(self.date_joined),
             "api_tokens": [x.to_dict() for x in self.api_tokens]
         }
+
+
+class Session(Document):
+    token = UUIDField(default=uuid.uuid4)
+    user = ReferenceField(User)
 
 
 class EventFieldConstraint(EmbeddedDocument):
