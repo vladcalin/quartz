@@ -7,9 +7,9 @@ from mongoengine import connect, Document, StringField, IntField, BooleanField, 
     ReferenceField, DictField, ListField, ValidationError, EmailField, EmbeddedDocument, EmbeddedDocumentListField, \
     UUIDField, DoesNotExist
 
-from eventer.errors import CategoryValidationError, FieldNotFoundError, InvalidValueError
+from eventer.errors import CategoryValidationError, FieldNotFoundError, InvalidValueError, ConstraintViolationError
 from eventer.util import generate_uuid_token
-from eventer.constraints import constraint_str_length_max, constraint_str_length_min, constraint_str_regex
+from eventer.constraints import ConstraintNames, ConstraintFactory
 
 connect(db="eventer", host="127.0.0.1", port=27017)
 
@@ -115,23 +115,10 @@ class EventFieldConstraint(EmbeddedDocument):
     A constraint for a :py:class:`eventer.models.EventField` instance.
     """
 
-    class Names:
-        """
-        Supported constraints names.
-        """
-        str_len_min = "str_len_min"
-        str_len_max = "str_len_max"
-        str_regex = "str_regex"
-
-    _defined_constraints = {
-        Names.str_len_min: constraint_str_length_min,
-        Names.str_len_max: constraint_str_length_max,
-        Names.str_regex: constraint_str_regex
-    }
-
-    type = StringField(choices=tuple(_defined_constraints.keys()))
+    type = StringField(choices=ConstraintNames.all)
     parameters = ListField()
 
+    # noinspection PyTypeChecker
     def is_valid(self, value):
         """
         Checks if the given **value** violates this constraint. If it returns True, the value is valid, if it returns
@@ -140,8 +127,12 @@ class EventFieldConstraint(EmbeddedDocument):
         :param value: value to be checked
         :return:
         """
-        func = self._defined_constraints.get(self.type)
-        return func(value, *list(self.parameters))
+        try:
+            ConstraintFactory.get(self.type, *list(self.parameters)).check(value)
+        except ConstraintViolationError:
+            return False
+        else:
+            return True
 
 
 class EventField(EmbeddedDocument):

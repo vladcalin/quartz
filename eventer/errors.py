@@ -1,3 +1,6 @@
+# coding=utf-8
+
+
 class EventerError(Exception):
     """
     Base exception for all eventer related errors
@@ -26,3 +29,8 @@ class FatalErrorThatShouldNeverHappen(EventerError):
 
 class InvalidValueError(EventerError):
     pass
+
+
+class ConstraintViolationError(EventerError):
+    pass
+
