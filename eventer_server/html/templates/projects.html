@@ -10,33 +10,40 @@
         <div class="card-header">
             <button class="btn btn-success">Create</button>
         </div>
-        <div class="card-body">
-            <table class="table table-striped primary" id="projects"
-                   width="100%"></table>
+        <div class="card-body no-padding">
+            <table class="datatable table table-striped primary" cellspacing="0" width="100%">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Owner</th>
+                    <th>Event count</th>
+                    <th>Last event</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for project in projects %}
+                <tr>
+                    <td>{{ project.name }}</td>
+                    <td>{{ project.description }}</td>
+                    <td>{{ project.owner }}</td>
+                    <td>{{ project.event_count() }}</td>
+                    <td>{{ project.last_event_humanized() }}</td>
+                    <td>
+                        <button class="btn btn-info btn-xs">View</button>
+                    </td>
+                </tr>
+                {% end %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
+
 <script>
-    $(document).ready(function () {
-        $('#projects').DataTable({
-            data: [
-                ["test.project.1", "10.12.2016 11:22", "Vlad Calin", 5, 1131, "one hour ago"],
-                ["test.project.2", "10.12.2016 11:22", "Vlad Calin", 5, 1131, "one hour ago"],
-                ["test.project.3", "10.12.2016 11:22", "Vlad Calin", 5, 1131, "one hour ago"],
-                ["test.project.4", "10.12.2016 11:22", "Vlad Calin", 5, 1131, "one hour ago"],
-                ["test.project.5", "10.12.2016 11:22", "Vlad Calin", 5, 1131, "one hour ago"]
-            ],
-            columns: [
-                {title: "Name"},
-                {title: "Added"},
-                {title: "Owner"},
-                {title: "Event types"},
-                {title: "Events"},
-                {title: "Last event added"}
-            ]
-        });
-    })
+
 </script>
 
 {% end %}

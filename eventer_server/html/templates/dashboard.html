@@ -14,7 +14,7 @@
                 <i class="icon fa fa-cogs fa-4x"></i>
                 <div class="content">
                     <div class="title">Projects</div>
-                    <div class="value">100</div>
+                    <div class="value">{{ project_count }}</div>
                 </div>
             </div>
         </a>
@@ -27,7 +27,7 @@
                 <i class="icon fa fa-th-list fa-4x"></i>
                 <div class="content">
                     <div class="title">Event types</div>
-                    <div class="value">144</div>
+                    <div class="value">{{event_category_count}}</div>
                 </div>
             </div>
         </a>
@@ -40,7 +40,7 @@
                 <i class="icon fa fa-envelope-o fa-4x"></i>
                 <div class="content">
                     <div class="title">Events</div>
-                    <div class="value">18009</div>
+                    <div class="value">{{event_count}}</div>
                 </div>
             </div>
         </a>
@@ -62,34 +62,15 @@
                     </tr>
                     </thead>
                     <tbody>
+                    {% for project in projects %}
                     <tr>
-                        <th>test.project.1</th>
-                        <td>113</td>
-                        <td>2144</td>
-                        <td>11334</td>
-                        <td>1988489</td>
+                        <th>{{ project.name }}</th>
+                        <td>{{ project.event_count(hours=1) }}</td>
+                        <td>{{ project.event_count(hours=24) }}</td>
+                        <td>{{ project.event_count(hours=168) }}</td>
+                        <td>{{ project.event_count() }}</td>
                     </tr>
-                    <tr>
-                        <th>test.project.3</th>
-                        <td>113</td>
-                        <td>2144</td>
-                        <td>11334</td>
-                        <td>1988489</td>
-                    </tr>
-                    <tr>
-                        <th>test.project.5</th>
-                        <td>113</td>
-                        <td>2144</td>
-                        <td>11334</td>
-                        <td>1988489</td>
-                    </tr>
-                    <tr>
-                        <th>test.project.001.worker.beta2</th>
-                        <td>113</td>
-                        <td>2144</td>
-                        <td>11334</td>
-                        <td>1988489</td>
-                    </tr>
+                    {% end %}
                     </tbody>
                 </table>
             </div>
