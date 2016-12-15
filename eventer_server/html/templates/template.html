@@ -10,9 +10,7 @@
 
     <script src="/static/js/pymicroservice.js"></script>
 
-    {% if require_morris or require_datatable %}
     <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-    {% end %}
 
     {% if require_morris %}
 
@@ -78,21 +76,6 @@
 
     <div class="app-container">
 
-        <div class="btn-floating" id="help-actions">
-            <div class="btn-bg"></div>
-            <button type="button" class="btn btn-default btn-toggle" data-toggle="toggle" data-target="#help-actions">
-                <i class="icon fa fa-plus"></i>
-                <span class="help-text">Shortcut</span>
-            </button>
-            <div class="toggle-content">
-                <ul class="actions">
-                    <li><a href="/dashboard">Dashboard</a></li>
-                    <li><a href="#">Documentation</a></li>
-                    <li><a href="#">Issues</a></li>
-                    <li><a href="#">About</a></li>
-                </ul>
-            </div>
-        </div>
 
         <div class="container">
 

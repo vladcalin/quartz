@@ -8,7 +8,9 @@
 <div class="col-xs-12">
     <div class="card">
         <div class="card-header">
-            <button class="btn btn-success">Create</button>
+            <a href="/projects/create">
+                <button class="btn btn-success">Create</button>
+            </a>
         </div>
         <div class="card-body no-padding">
             <table class="datatable table table-striped primary" cellspacing="0" width="100%">
@@ -31,7 +33,9 @@
                     <td>{{ project.event_count() }}</td>
                     <td>{{ project.last_event_humanized() }}</td>
                     <td>
-                        <button class="btn btn-info btn-xs">View</button>
+                        <a href="/projects/view/{{str(project.id)}}">
+                            <button class="btn btn-info btn-xs">View</button>
+                        </a>
                     </td>
                 </tr>
                 {% end %}

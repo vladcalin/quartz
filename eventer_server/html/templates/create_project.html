@@ -1,0 +1,102 @@
+{% extends "template.html" %}
+
+
+{% block "content" %}
+<div class="row">
+    <div class="col-md-12" style="margin-top: 2%">
+        <div class="card">
+            <div class="card-body">
+                <form class="form form-horizontal">
+                    <div class="section">
+                        <div class="section-title"><h3>Create project</h3></div>
+                        <div class="section-body">
+
+                            <!--Project name-->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Project name</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" placeholder="" id="name">
+                                </div>
+                            </div>
+
+                            <!--Project description-->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Project description</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" placeholder="" id="description">
+                                </div>
+                            </div>
+
+                            <!--Project owner-->
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Owner</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" placeholder="" id="owner">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-footer">
+                        <div class="form-group">
+                            <div class="col-md-9 col-md-offset-3">
+                                <span class="btn btn-primary" id="submit">Submit
+                                </span>
+                                <span onclick="window.history.back();" class="btn btn-default">
+                                    Cancel
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="alert alert-danger  alert-dismissible" role="alert" hidden id="error-msg-box">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+        </button>
+        <strong>Woops... Something went wrong...</strong> (<span id="error-msg"></span>)
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var submitProject = function () {
+            var name = $("#name").val();
+            var description = $("#description").val();
+            var owner = $("#owner").val();
+
+
+            pymicroserviceMethodCall({
+                "method": "create_project",
+                "params": {
+                    "name": name,
+                    "description": description,
+                    "owner": owner
+                },
+                "onSuccess": function (data) {
+                    console.log(data);
+                    if (data.error !== null) {
+                        $("#error-msg").html("<p>" + JSON.stringify(data.error) + "</p>");
+                        $("#error-msg-box").show();
+                        return
+                    }
+                    else {
+                        window.location.href = "/projects/view/" + data.result;
+                        return
+                    }
+                }
+            })
+        };
+        $("#submit").on('click', function (event) {
+            event.preventDefault();
+            submitProject();
+        })
+    });
+
+</script>
+
+{% end %}
+

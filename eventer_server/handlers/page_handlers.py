@@ -2,10 +2,11 @@ import datetime
 from collections import namedtuple
 import random
 from concurrent.futures import ThreadPoolExecutor
+import logging
 
 import humanize
-
-from tornado.web import RequestHandler
+from mongoengine import DoesNotExist
+from tornado.web import RequestHandler, HTTPError
 from tornado.gen import coroutine
 
 from eventer_server import __version__
@@ -64,3 +65,21 @@ class StatusHandler(RequestHandler):
     @coroutine
     def get(self):
         self.render("status.html", version=__version__, require_morris=True, require_datatable=False)
+
+
+class CreateProjectHandler(RequestHandler):
+    @coroutine
+    def get(self):
+        self.render("create_project.html", version=__version__, require_morris=False, require_datatable=False)
+
+
+class ViewProjectHandler(RequestHandler):
+    @coroutine
+    def get(self, proj_id, *args, **kwargs):
+        logging.warning(args, kwargs)
+        try:
+            project = yield _executor.submit(Project.objects.get, id=proj_id)
+        except DoesNotExist:
+            raise HTTPError(404)
+        self.render("project_view.html", version=__version__, require_morris=False, require_datatable=False,
+                    project=project)
