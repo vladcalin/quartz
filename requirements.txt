@@ -1,4 +1,3 @@
 tornado
 mongoengine
-bcrypt
-simplejson
+pymicroservice

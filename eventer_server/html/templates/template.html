@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eventer {{version}}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" href="/static/css/vendor.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/flat-admin.css">
+
+</head>
+<body>
+<div class="app app-default">
+
+    <aside class="app-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a class="sidebar-brand" href="#"><span class="highlight">Eventer</span> {{version}}</a>
+        </div>
+        <div class="sidebar-menu">
+            <ul class="sidebar-nav">
+                <li class="active">
+                    <a href="template.html">
+                        <div class="icon">
+                            <i class="fa fa-tasks" aria-hidden="true"></i>
+                        </div>
+                        <div class="title">Dashboard</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="/projects">
+                        <div class="icon">
+                            <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        </div>
+                        <div class="title">Projects</div>
+                    </a>
+                </li>
+                <li class="@@menu.event_types">
+                    <a href="/event_types">
+                        <div class="icon">
+                            <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        </div>
+                        <div class="title">Event types</div>
+                    </a>
+                </li>
+                <li class="@@menu.events">
+                    <a href="/events">
+                        <div class="icon">
+                            <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        </div>
+                        <div class="title">Events</div>
+                    </a>
+                </li>
+                <li class="@@menu.events">
+                    <a href="/status">
+                        <div class="icon">
+                            <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        </div>
+                        <div class="title">Status</div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <div class="app-container">
+
+        <div class="btn-floating" id="help-actions">
+            <div class="btn-bg"></div>
+            <button type="button" class="btn btn-default btn-toggle" data-toggle="toggle" data-target="#help-actions">
+                <i class="icon fa fa-plus"></i>
+                <span class="help-text">Shortcut</span>
+            </button>
+            <div class="toggle-content">
+                <ul class="actions">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Issues</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="container">
+
+            {% block "content" %}
+            {% end %}
+
+        </div>
+
+        <footer class="app-footer">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="footer-copyright">
+                        Copyright © 2016 - Eventer
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+</div>
+
+<script type="text/javascript" src="/static/js/vendor.js"></script>
+<script type="text/javascript" src="/static/js/app.js"></script>
+
+</body>
+</html>
