@@ -8,18 +8,38 @@
     <link rel="stylesheet" type="text/css" href="/static/css/vendor.css">
     <link rel="stylesheet" type="text/css" href="/static/css/flat-admin.css">
 
+    {% if require_morris or require_datatable %}
+    <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+    {% end %}
+
+    {% if require_morris %}
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+    <script src="http:///cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+
+    {% end %}
+
+    {% if require_datatable %}
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+
+    {% end %}
+
 </head>
 <body>
 <div class="app app-default">
 
     <aside class="app-sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a class="sidebar-brand" href="#"><span class="highlight">Eventer</span> {{version}}</a>
+            <a class="sidebar-brand" href="/dashboard"><span class="highlight">Eventer</span> {{version}}</a>
         </div>
         <div class="sidebar-menu">
             <ul class="sidebar-nav">
                 <li class="active">
-                    <a href="template.html">
+                    <a href="/dashboard">
                         <div class="icon">
                             <i class="fa fa-tasks" aria-hidden="true"></i>
                         </div>
@@ -72,7 +92,7 @@
             </button>
             <div class="toggle-content">
                 <ul class="actions">
-                    <li><a href="#">Home</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
                     <li><a href="#">Documentation</a></li>
                     <li><a href="#">Issues</a></li>
                     <li><a href="#">About</a></li>

@@ -1,0 +1,43 @@
+{% extends "template.html" %}
+
+
+{% block "content" %}
+
+<h3>Projects</h3>
+
+<div class="col-xs-12">
+    <div class="card">
+        <div class="card-header">
+            <button class="btn btn-success">Create</button>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped primary" id="projects"
+                   width="100%"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#projects').DataTable({
+            data: [
+                ["test.project.1", "10.12.2016 11:22", "Vlad Calin", 5, 1131, "one hour ago"],
+                ["test.project.2", "10.12.2016 11:22", "Vlad Calin", 5, 1131, "one hour ago"],
+                ["test.project.3", "10.12.2016 11:22", "Vlad Calin", 5, 1131, "one hour ago"],
+                ["test.project.4", "10.12.2016 11:22", "Vlad Calin", 5, 1131, "one hour ago"],
+                ["test.project.5", "10.12.2016 11:22", "Vlad Calin", 5, 1131, "one hour ago"]
+            ],
+            columns: [
+                {title: "Name"},
+                {title: "Added"},
+                {title: "Owner"},
+                {title: "Event types"},
+                {title: "Events"},
+                {title: "Last event added"}
+            ]
+        });
+    })
+</script>
+
+{% end %}
+

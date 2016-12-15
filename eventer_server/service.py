@@ -7,11 +7,8 @@ from pymicroservice.core.microservice import PyMicroService
 from pymicroservice.core.decorators import public_method, private_api_method
 from eventer_server import __version__
 
-
-class IndexHandler(RequestHandler):
-    @coroutine
-    def get(self):
-        self.render("index.html", version=__version__)
+from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHandler, EventTypesHandler, EventsHandler, \
+    StatusHandler
 
 
 class EventerService(PyMicroService):
@@ -23,15 +20,20 @@ class EventerService(PyMicroService):
     max_parallel_blocking_tasks = os.cpu_count()
 
     extra_handlers = [
-        ("/eventer", IndexHandler),
+        ("/dashboard", DashboardHandler),
+        ("/projects", ProjectsHandler),
+        ("/event_types", EventTypesHandler),
+        ("/events", EventsHandler),
+        ("/status", StatusHandler),
     ]
 
+    root_directory = os.path.dirname(os.path.abspath(__file__))
     # create your templates
-    template_dir = os.path.join("html", "templates")
+    template_dir = os.path.join(root_directory, "html", "templates")
 
     # setup your static files
     static_dirs = [
-        (r"/static", os.path.join("html", "static")),
+        (r"/static", os.path.join(root_directory, "html", "static")),
     ]
 
     # service registries

@@ -1,0 +1,100 @@
+{% extends "template.html" %}
+
+
+{% block "content" %}
+
+<h3>Dashboard</h3>
+
+<!--Item counts-->
+<div class="row">
+    <!--Projects-->
+    <div class="col-lg-4">
+        <a class="card card-banner card-green-light">
+            <div class="card-body">
+                <i class="icon fa fa-cogs fa-4x"></i>
+                <div class="content">
+                    <div class="title">Projects</div>
+                    <div class="value">100</div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!--Event types-->
+    <div class="col-lg-4">
+        <a class="card card-banner card-green-light">
+            <div class="card-body">
+                <i class="icon fa fa-th-list fa-4x"></i>
+                <div class="content">
+                    <div class="title">Event types</div>
+                    <div class="value">144</div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!--Projects-->
+    <div class="col-lg-4">
+        <a class="card card-banner card-green-light">
+            <div class="card-body">
+                <i class="icon fa fa-envelope-o fa-4x"></i>
+                <div class="content">
+                    <div class="title">Events</div>
+                    <div class="value">18009</div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 2.5%">
+    <div class="card-body">
+        <div class="row">
+                <h4>Most active projects</h4>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Project name</th>
+                        <th>Events (last hour)</th>
+                        <th>Events (last 24h)</th>
+                        <th>Events (last week)</th>
+                        <th>Total event count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th>test.project.1</th>
+                        <td>113</td>
+                        <td>2144</td>
+                        <td>11334</td>
+                        <td>1988489</td>
+                    </tr>
+                    <tr>
+                        <th>test.project.3</th>
+                        <td>113</td>
+                        <td>2144</td>
+                        <td>11334</td>
+                        <td>1988489</td>
+                    </tr>
+                    <tr>
+                        <th>test.project.5</th>
+                        <td>113</td>
+                        <td>2144</td>
+                        <td>11334</td>
+                        <td>1988489</td>
+                    </tr>
+                    <tr>
+                        <th>test.project.001.worker.beta2</th>
+                        <td>113</td>
+                        <td>2144</td>
+                        <td>11334</td>
+                        <td>1988489</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% end %}
+
