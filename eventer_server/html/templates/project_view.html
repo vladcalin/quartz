@@ -5,6 +5,37 @@
 
 <h3>Project {{project.name}}</h3>
 
+<p>{{project.description}}</p>
+<p><strong>Owner: {{project.owner}}</strong></p>
+<div class="row">
+    <div class="col-lg-12">
+        <h4>General actions</h4>
+        <a href="/projects/view/{{project.id}}/edit"><button class="btn btn-success btn-xs" id="edit-btn">Edit</button></a>
+        <a href="/projects/view/{{project.id}}/delete"><button class="btn btn-danger btn-xs" id="delete-btn">Delete</button></a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h4>Event categories</h4>
+        <a href="/projects/view/{{project.id}}/create_category"><button class="btn btn-success btn-xs">Add</button></a>
+
+        <table class="table">
+            <tbody>
+            {% for i in range(5) %}
+            <tr>
+                <td><code>results</code></td>
+                <td><a href="#"><span class="label label-info">View</span></a>
+                </td>
+                <td><a href="#"><span class="label label-danger">Delete</span></a>
+                </td>
+            </tr>
+            {% end %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
 
 
 {% end %}

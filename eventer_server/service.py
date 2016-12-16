@@ -21,7 +21,7 @@ class EventerService(PyMicroService):
     max_parallel_blocking_tasks = os.cpu_count()
 
     extra_handlers = [
-        ("/projects/view/(.*)", ViewProjectHandler),
+        ("/projects/view/([a-f0-9]+)", ViewProjectHandler),
         ("/dashboard", DashboardHandler),
         ("/projects", ProjectsHandler),
         ("/event_types", EventTypesHandler),

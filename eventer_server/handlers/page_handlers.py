@@ -76,7 +76,6 @@ class CreateProjectHandler(RequestHandler):
 class ViewProjectHandler(RequestHandler):
     @coroutine
     def get(self, proj_id, *args, **kwargs):
-        logging.warning(args, kwargs)
         try:
             project = yield _executor.submit(Project.objects.get, id=proj_id)
         except DoesNotExist:
