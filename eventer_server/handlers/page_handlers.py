@@ -10,7 +10,7 @@ from tornado.web import RequestHandler, HTTPError
 from tornado.gen import coroutine
 
 from eventer_server import __version__
-from eventer_server.models import Project
+from eventer_server.models import Project, EventCategory, FieldSpecs
 
 ProjectMock = namedtuple("Project", "name description owner category_count event_count last_event_humanized")
 
@@ -78,7 +78,30 @@ class ViewProjectHandler(RequestHandler):
     def get(self, proj_id, *args, **kwargs):
         try:
             project = yield _executor.submit(Project.objects.get, id=proj_id)
+            categories = yield _executor.submit(EventCategory.objects, project=proj_id)
         except DoesNotExist:
             raise HTTPError(404)
         self.render("project_view.html", version=__version__, require_morris=False, require_datatable=False,
+                    project=project, categories=categories)
+
+
+class EditProjectHandler(RequestHandler):
+    @coroutine
+    def get(self, proj_id, *args, **kwargs):
+        try:
+            project = yield _executor.submit(Project.objects.get, id=proj_id)
+        except DoesNotExist:
+            raise HTTPError(404)
+        self.render("project_edit.html", version=__version__, require_morris=False, require_datatable=False,
+                    project=project)
+
+
+class CreateEventCategoryHandler(RequestHandler):
+    @coroutine
+    def get(self, proj_id, *args, **kwargs):
+        try:
+            project = yield _executor.submit(Project.objects.get, id=proj_id)
+        except DoesNotExist:
+            raise HTTPError(404)
+        self.render("create_category.html", version=__version__, require_morris=False, require_datatable=False,
                     project=project)
