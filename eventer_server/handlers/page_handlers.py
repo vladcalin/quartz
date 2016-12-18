@@ -105,3 +105,15 @@ class CreateEventCategoryHandler(RequestHandler):
             raise HTTPError(404)
         self.render("create_category.html", version=__version__, require_morris=False, require_datatable=False,
                     project=project)
+
+
+class ViewEventCategory(RequestHandler):
+    @coroutine
+    def get(self, proj_id, event_category_id):
+        try:
+            project = yield _executor.submit(Project.objects.get, id=proj_id)
+            event_category = yield _executor.submit(EventCategory.objects.get, id=event_category_id)
+        except DoesNotExist:
+            raise HTTPError(404)
+        self.render("category_view.html", version=__version__, require_morris=False, require_datatable=False,
+                    project=project, event_category=event_category)

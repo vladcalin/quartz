@@ -1,0 +1,83 @@
+{% extends "template.html" %}
+
+
+{% block "content" %}
+
+<h3>Category {{event_category.name}}
+    <small>from project {{project.name}}</small>
+</h3>
+
+<div class="col-sm-12 col-xs-12">
+    <div class="card">
+        <div class="card-header">
+            Submitting events
+        </div>
+        <div class="card-body">
+            <div class="section">
+                <div class="section-body">
+                    <div role="tabpanel">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#raw_http" aria-controls="home" role="tab"
+                                                                      data-toggle="tab" aria-expanded="true">Raw HTTP
+                                requests</a>
+                            </li>
+                            <li role="presentation"><a href="#python" aria-controls="home" role="tab"
+                                                       data-toggle="tab" aria-expanded="true">Using Python</a>
+                            </li>
+
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="raw_http">
+                                <p>
+                                    Make raw HTTP <code>POST</code> requests to <code>/api</code> with the body:
+                                </p>
+<pre><code id="html_code_snippet">
+</code></pre>
+
+
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="python">
+                                <p>You will need the <code>eventer-client</code> library.</p>
+
+<pre><code class="python">
+from eventer_client import Event
+
+event = Event(category="{{event_category.id}}")
+
+{% for fieldspec in event_category.fields %}event.{{fieldspec.name}} = "{{fieldspec.type}} value"<br>{% end %}
+
+event.submit()
+
+</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        var htmlSnippet = {
+            "jsonrpc": "2.0",
+            "method": "submit_event",
+            "params": {
+                "source": "Your name",
+                "category": "{{ event_category.id }}",
+                "values": {}
+            }
+        };
+        {% for fieldspec in event_category.fields %}
+        htmlSnippet["params"]["values"]["{{fieldspec.name}}"] = "{{fieldspec.type}} value";
+        {%  end %}
+
+        $("#html_code_snippet").html(JSON.stringify(htmlSnippet, null, 4));
+    })
+</script>
+{% end %}
+

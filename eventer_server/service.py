@@ -8,7 +8,8 @@ from pymicroservice.core.microservice import PyMicroService
 from pymicroservice.core.decorators import public_method, private_api_method
 
 from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHandler, EventTypesHandler, EventsHandler, \
-    StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler
+    StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
+    ViewEventCategory
 from eventer_server.models import Project, FieldSpecs, EventCategory
 
 
@@ -24,6 +25,7 @@ class EventerService(PyMicroService):
         ("/projects/view/([a-f0-9]+)", ViewProjectHandler),
         ("/projects/view/([a-f0-9]+)/edit", EditProjectHandler),
         ("/projects/view/([a-f0-9]+)/create_category", CreateEventCategoryHandler),
+        ("/projects/view/([a-f0-9]+)/categories/([a-f0-9]+)", ViewEventCategory),
         ("/dashboard", DashboardHandler),
         ("/projects", ProjectsHandler),
         ("/event_types", EventTypesHandler),
@@ -78,6 +80,10 @@ class EventerService(PyMicroService):
     @public_method
     def create_category(self, name, description, project_id, fields):
         field_specs = [FieldSpecs(**fieldspec) for fieldspec in fields]
+
+        if len(set([f["name"] for f in field_specs])) != len(field_specs):
+            raise ValueError("Duplicate value name")
+
         event_category = EventCategory(name=name, description=description, project=project_id, fields=field_specs)
         event_category.save()
         return str(event_category.id)
@@ -87,6 +93,6 @@ class EventerService(PyMicroService):
         return True
 
 
-if __name__ == '__main__':
+def main():
     service = EventerService()
     service.start()

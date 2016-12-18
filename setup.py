@@ -32,5 +32,11 @@ setup(
     author_email=get_meta_attr_from_string("__email__", module_content),
 
     packages=find_packages(),
-    install_requires=read_dependencies("requirements.txt")
+    install_requires=read_dependencies("requirements.txt"),
+
+    entry_points={
+        "console_scripts": [
+            "eventer = eventer_server.service:main"
+        ]
+    }
 )

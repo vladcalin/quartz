@@ -19,7 +19,7 @@ class Project(Document):
 
     @property
     def event_category_count(self):
-        return 0
+        return EventCategory.objects(project=self).count()
 
     def last_event_humanized(self):
         return "No events"
