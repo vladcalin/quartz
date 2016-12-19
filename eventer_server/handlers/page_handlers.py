@@ -10,7 +10,7 @@ from tornado.web import RequestHandler, HTTPError
 from tornado.gen import coroutine
 
 from eventer_server import __version__
-from eventer_server.models import Project, EventCategory, FieldSpecs
+from eventer_server.models import Project, EventCategory, FieldSpecs, Event
 
 ProjectMock = namedtuple("Project", "name description owner category_count event_count last_event_humanized")
 
@@ -33,7 +33,7 @@ class DashboardHandler(RequestHandler):
         ordered = list(sorted(projects, key=lambda x: x.event_count(hours=1)))[:5]
 
         event_category_count = sum([x.event_category_count for x in projects])
-        event_count = sum([x.event_count() for x in projects])
+        event_count = Event.objects.count()
 
         self.render("dashboard.html", version=__version__, require_morris=True, require_datatable=False,
                     project_count=len(projects),
@@ -113,7 +113,12 @@ class ViewEventCategory(RequestHandler):
         try:
             project = yield _executor.submit(Project.objects.get, id=proj_id)
             event_category = yield _executor.submit(EventCategory.objects.get, id=event_category_id)
+
+            total_events = yield _executor.submit(Event.objects.count)
+            last_submitted_event = yield _executor.submit(Event.objects.only('timestamp', 'source').order_by("-timestamp").first)
         except DoesNotExist:
             raise HTTPError(404)
         self.render("category_view.html", version=__version__, require_morris=False, require_datatable=False,
-                    project=project, event_category=event_category)
+                    project=project, event_category=event_category, event_count=total_events,
+                    last_submit_time=humanize.naturaltime(last_submitted_event.timestamp),
+                    last_submit_source=last_submitted_event.source)

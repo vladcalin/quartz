@@ -1,5 +1,6 @@
 import os
 import logging
+import argparse
 
 from tornado.web import RequestHandler
 from tornado.gen import coroutine
@@ -10,7 +11,7 @@ from pymicroservice.core.decorators import public_method, private_api_method
 from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHandler, EventTypesHandler, EventsHandler, \
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
     ViewEventCategory
-from eventer_server.models import Project, FieldSpecs, EventCategory
+from eventer_server.models import Project, FieldSpecs, EventCategory, Event
 
 
 class EventerService(PyMicroService):
@@ -87,6 +88,16 @@ class EventerService(PyMicroService):
         event_category = EventCategory(name=name, description=description, project=project_id, fields=field_specs)
         event_category.save()
         return str(event_category.id)
+
+    @public_method
+    def submit_event(self, source, category, values):
+        event = Event()
+        event.source = source
+        event.category = category
+        event.set_values(**values)
+
+        event.save()
+        return str(event.id)
 
     # Implement your token validation logic
     def api_token_is_valid(self, api_token):

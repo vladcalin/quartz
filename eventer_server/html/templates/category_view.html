@@ -8,6 +8,22 @@
 </h3>
 
 <div class="col-sm-12 col-xs-12">
+
+    <div class="card">
+        <div class="card-header">
+            General stats
+        </div>
+        <div class="card-body">
+            <p><strong>Total events: </strong>{{event_count}}</p>
+            <p><strong>Last event submitted: </strong>{{last_submit_time}}</p>
+            <p><strong>Last event's source: </strong>{{last_submit_source}}</p>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="col-sm-12 col-xs-12">
     <div class="card">
         <div class="card-header">
             Submitting events
@@ -61,6 +77,7 @@ event.submit()
 </div>
 
 
+
 <script>
     $(document).ready(function () {
         var htmlSnippet = {
@@ -74,7 +91,7 @@ event.submit()
         };
         {% for fieldspec in event_category.fields %}
         htmlSnippet["params"]["values"]["{{fieldspec.name}}"] = "{{fieldspec.type}} value";
-        {%  end %}
+        {% end %}
 
         $("#html_code_snippet").html(JSON.stringify(htmlSnippet, null, 4));
     })
