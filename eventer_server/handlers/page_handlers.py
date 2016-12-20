@@ -118,7 +118,7 @@ class ViewEventCategory(RequestHandler):
             last_submitted_event = yield _executor.submit(Event.objects.only('timestamp', 'source').order_by("-timestamp").first)
         except DoesNotExist:
             raise HTTPError(404)
-        self.render("category_view.html", version=__version__, require_morris=False, require_datatable=False,
+        self.render("category_view.html", version=__version__, require_morris=False, require_datatable=True,
                     project=project, event_category=event_category, event_count=total_events,
-                    last_submit_time=humanize.naturaltime(last_submitted_event.timestamp),
-                    last_submit_source=last_submitted_event.source)
+                    last_submit_time=(humanize.naturaltime(last_submitted_event.timestamp) if last_submitted_event else "No events"),
+                    last_submit_source=(last_submitted_event.source if last_submitted_event else "No events"))

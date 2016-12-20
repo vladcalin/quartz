@@ -6,6 +6,8 @@ import humanize
 from mongoengine import connect, Document, EmbeddedDocument, ReferenceField, StringField, BooleanField, DateTimeField, \
     EmbeddedDocumentListField, BinaryField, DictField, Q
 
+from eventer_server.lib.util import str_interval_to_datetime
+
 connect("eventer")
 
 
@@ -84,6 +86,23 @@ class Event(Document):
             raise ValueError("Invalid type name")
         type_class = eval(type)
         return isinstance(value, type_class)
+
+    @classmethod
+    def filter_by_query(cls, query_parse_result):
+        """
+        Filters queries based on the query parse result
+
+        :param parse_result:
+        :return:
+        """
+        if query_parse_result.operation == "select":
+            category = EventCategory.objects.get(name=query_parse_result.category)
+
+            target_datetime = str_interval_to_datetime(query_parse_result.interval)
+            events = cls.objects.filter(Q(category=category) & Q(timestamp__gte=target_datetime)).all()
+            return events
+
+        return []
 
 
 if __name__ == '__main__':

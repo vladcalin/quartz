@@ -1,6 +1,7 @@
 import os
 import logging
 import argparse
+import datetime
 
 from tornado.web import RequestHandler
 from tornado.gen import coroutine
@@ -11,6 +12,7 @@ from pymicroservice.core.decorators import public_method, private_api_method
 from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHandler, EventTypesHandler, EventsHandler, \
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
     ViewEventCategory
+from eventer_server.lib.query import QueryParser
 from eventer_server.models import Project, FieldSpecs, EventCategory, Event
 
 
@@ -98,6 +100,16 @@ class EventerService(PyMicroService):
 
         event.save()
         return str(event.id)
+
+    @public_method
+    def query_events(self, query):
+        parse_result = QueryParser().parse_query(query)
+        events = Event.filter_by_query(parse_result)
+        return [{
+                    "timestamp": event.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                    "values": event.values,
+                    "source": event.source
+                } for event in events]
 
     # Implement your token validation logic
     def api_token_is_valid(self, api_token):
