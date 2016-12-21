@@ -29,12 +29,12 @@
                         </li>
                         <li><p>Example query for events from the category relevant_events from the last 10 minutes with
                             the field "count" equal to 10</p>
-                            <code>select "relevant_events" where __timestamp__ >= 10m and fields__count=10</code></li>
+                            <code>select "relevant_events" where __timestamp__ >= 10m and values__count=10</code></li>
                         <li>p>Examplq query for events from the category relevant_events from the last hour with the
                             fields
                             field_1 equal to "hello" and field_2 greater or equal than 0</p>
-                            <code>select "relevant_events" where __timestamp__ >= 1h and fields__field_1="hello" and
-                                fields__field_2>=0</code></li>
+                            <code>select "relevant_events" where __timestamp__ >= 1h and values__field_1="hello" and
+                                values__field_2>=0</code></li>
                     </ul>
 
                     <p class="text-danger"><i class="glyphicon glyphicon-alert"></i> Check the documentation for more

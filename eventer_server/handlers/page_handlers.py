@@ -6,6 +6,7 @@ import logging
 
 import humanize
 from mongoengine import DoesNotExist
+from mongoengine.connection import get_connection
 from tornado.web import RequestHandler, HTTPError
 from tornado.gen import coroutine
 
@@ -64,7 +65,29 @@ class EventsHandler(RequestHandler):
 class StatusHandler(RequestHandler):
     @coroutine
     def get(self):
-        self.render("status.html", version=__version__, require_morris=True, require_datatable=False)
+        db_conn = get_connection()
+        eventer_db = db_conn["eventer"]
+        project_stats = eventer_db.command("collstats", "project")
+        category_stats = eventer_db.command("collstats", "event_category")
+        event_stats = eventer_db.command("collstats", "event")
+
+        project_size = humanize.naturalsize(project_stats["storageSize"])
+        project_index_size = humanize.naturalsize(project_stats["totalIndexSize"])
+
+        category_size = humanize.naturalsize(category_stats["storageSize"])
+        category_index_size = humanize.naturalsize(category_stats["totalIndexSize"])
+
+        event_size = humanize.naturalsize(event_stats["storageSize"])
+        event_index_size = humanize.naturalsize(event_stats["totalIndexSize"])
+        event_count = event_stats["count"]
+        event_avg_size = humanize.naturalsize(event_stats["avgObjSize"])
+
+        self.render("status.html", version=__version__, require_morris=True, require_datatable=False,
+
+                    project_size=project_size, project_index_size=project_index_size,
+                    category_size=category_size, category_index_size=category_index_size,
+                    event_size=event_size, event_index_size=event_index_size, event_count=event_count,
+                    event_avg_size=event_avg_size)
 
 
 class CreateProjectHandler(RequestHandler):
@@ -114,11 +137,13 @@ class ViewEventCategory(RequestHandler):
             project = yield _executor.submit(Project.objects.get, id=proj_id)
             event_category = yield _executor.submit(EventCategory.objects.get, id=event_category_id)
 
-            total_events = yield _executor.submit(Event.objects.count)
-            last_submitted_event = yield _executor.submit(Event.objects.only('timestamp', 'source').order_by("-timestamp").first)
+            total_events = yield _executor.submit(Event.objects(category=event_category).count)
+            last_submitted_event = yield _executor.submit(
+                Event.objects(category=event_category).only('timestamp', 'source').order_by("-timestamp").first)
         except DoesNotExist:
             raise HTTPError(404)
         self.render("category_view.html", version=__version__, require_morris=False, require_datatable=True,
                     project=project, event_category=event_category, event_count=total_events,
-                    last_submit_time=(humanize.naturaltime(last_submitted_event.timestamp) if last_submitted_event else "No events"),
+                    last_submit_time=(
+                        humanize.naturaltime(last_submitted_event.timestamp) if last_submitted_event else "No events"),
                     last_submit_source=(last_submitted_event.source if last_submitted_event else "No events"))

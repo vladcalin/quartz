@@ -60,7 +60,7 @@
 <pre><code class="python">
 from eventer_client import Event
 
-event = Event(category="{{event_category.id}}")
+event = Event(category="{{event_category.id}}", url="http://host:port/api")
 
 {% for fieldspec in event_category.fields %}event.{{fieldspec.name}} = "{{fieldspec.type}} value"<br>{% end %}
 

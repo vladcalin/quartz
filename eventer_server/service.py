@@ -104,8 +104,6 @@ class EventerService(PyMicroService):
     @public_method
     def query_events(self, query):
         parse_result = QueryParser().parse_query(query)
-        print(parse_result.category)
-        print(parse_result.filters)
         events = Event.filter_by_query(parse_result)
         return [{
                     "timestamp": event.timestamp.strftime("%Y-%m-%d %H:%M:%S"),

@@ -52,7 +52,7 @@ class EventCategory(Document):
 
 
 class Event(Document):
-    category = ReferenceField(EventCategory)
+    category = ReferenceField(EventCategory, index=True)
     timestamp = DateTimeField(default=datetime.datetime.now)
     source = StringField(required=False)
     values = DictField()
