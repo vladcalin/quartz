@@ -15,16 +15,28 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading" style="padding: 10px;">
-                    Example query
+                    Example query <a href="#" class="text-success pull-right" onclick="$('#sample-queries').toggle()">Show</a>
                 </div>
-                <div class="panel-body">
-                    <p>Example query for events from the last 24h from the event category
-                        Category1:</p>
-                    <code>select "Category1" >= 24h</code>
+                <div class="panel-body" id="sample-queries" hidden>
+                    <ul>
+                        <li><p>Example query for events from the last 24h from the event category
+                            Category1:</p>
+                            <code>select "Category1" where __timestamp__ >= 24h</code></li>
+                        <li><p>Example query for events from the last 15 minutes from the event category
+                            events_category_01:</p>
+                            <code>select "events_category_01" where __timestamp__ >= 15m</code>
+                            (note that 15m means 15 minutes, 24h means 24 hours)
+                        </li>
+                        <li><p>Example query for events from the category relevant_events from the last 10 minutes with
+                            the field "count" equal to 10</p>
+                            <code>select "relevant_events" where __timestamp__ >= 10m and count=10</code></li>
+                        <li>p>Examplq query for events from the category relevant_events from the last hour with the
+                            fields
+                            field_1 equal to "hello" and field_2 greater or equal than 0</p>
+                            <code>select "relevant_events" where __timestamp__ >= 1h and field_1="hello" and
+                                field_2>=0</code></li>
+                    </ul>
 
-                    <p>Example query for events from the last 15 minutes from the event category
-                        events_category_01:</p>
-                    <code>select "events_category_01" >= 15m</code> (note that 15m means 15 minutes, 24h means 24 hours)
                 </div>
             </div>
             <div class="form-group">

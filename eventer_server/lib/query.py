@@ -6,16 +6,18 @@ class QueryParseError(Exception):
 
 
 class QueryTokens:
-    def __init__(self, operation, category, operator, interval):
-        self.operation = operation
+    def __init__(self, category, filters):
         self.category = category
-        self.operator = operator
-        self.interval = interval
+        self.filters = filters
 
 
 class QueryParser(object):
+    value_regex = re.compile(
+        r'(?P<key>[^\s]+?)\s*(?P<operator>[><=]+)\s*(?P<value>[^\s]+)'
+    )
     query_regex = re.compile(
-        '(?P<operation>[^\s]+)\s*"(?P<category>[^"]+)"\s(?P<operator>[^\s]+)\s(?P<interval>[^\s]+)')
+        'select\s*"(?P<category>[^"]+)"\s*where\s(?P<filter>.+)'
+    )
 
     def __init__(self):
         pass
@@ -25,15 +27,16 @@ class QueryParser(object):
         if not items:
             raise QueryParseError("Unable to parse query: {}".format(query_string))
 
-        return QueryTokens(
-            operation=items.group(1), category=items.group(2), operator=items.group(3),
-            interval=items.group(4)
-        )
+        category = items.group(1)
+        filter_string = items.group(2)
+
+        items = self.value_regex.findall(filter_string)
+        if not items:
+            raise QueryParseError("Unable to parse query: {}. Cannot extract filters".format(query_string))
+
+        return QueryTokens(category=category, filters=items)
 
 
 if __name__ == '__main__':
-    query = 'select "Category1" >= 24h'
-    items = QueryParser().parse_query(query)
-
-    query = 'select "events_category_01" >= 15m'
+    query = 'select "relevant_events" where __timestamp__ >= 1h and field_1="hello" and field_2>=0'
     items = QueryParser().parse_query(query)

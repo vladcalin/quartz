@@ -95,14 +95,37 @@ class Event(Document):
         :param parse_result:
         :return:
         """
-        if query_parse_result.operation == "select":
-            category = EventCategory.objects.get(name=query_parse_result.category)
+        query_params = {}
+        for key, operator, value in query_parse_result.filters:
+            if key == "__timestamp__":
+                query_params["__timestamp__"] = str_interval_to_datetime(value)
+                continue
+            current_key = key
+            if operator == "=":
+                pass
+            elif operator == ">":
+                current_key += "__gt"
+            elif operator == ">=":
+                current_key += "__gte"
+            elif operator == "<":
+                current_key += "__lt"
+            elif operator == "<=":
+                current_key += "__lte"
+            else:
+                raise ValueError("Invalid operator: {}".format(operator))
 
-            target_datetime = str_interval_to_datetime(query_parse_result.interval)
-            events = cls.objects.filter(Q(category=category) & Q(timestamp__gte=target_datetime)).all()
-            return events
+            try:
+                query_params[current_key] = json.loads(value)
+            except Exception as e:
+                query_params[current_key] = value
 
-        return []
+        print(query_params)
+        category = EventCategory.objects.get(name=query_parse_result.category)
+
+        target_datetime =query_params["__timestamp__"]
+        del query_params["__timestamp__"]
+        events = cls.objects(Q(category=category) & Q(timestamp__gte=target_datetime) & Q(**query_params)).all()
+        return events
 
 
 if __name__ == '__main__':
