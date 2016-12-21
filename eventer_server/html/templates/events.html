@@ -29,13 +29,16 @@
                         </li>
                         <li><p>Example query for events from the category relevant_events from the last 10 minutes with
                             the field "count" equal to 10</p>
-                            <code>select "relevant_events" where __timestamp__ >= 10m and count=10</code></li>
+                            <code>select "relevant_events" where __timestamp__ >= 10m and fields__count=10</code></li>
                         <li>p>Examplq query for events from the category relevant_events from the last hour with the
                             fields
                             field_1 equal to "hello" and field_2 greater or equal than 0</p>
-                            <code>select "relevant_events" where __timestamp__ >= 1h and field_1="hello" and
-                                field_2>=0</code></li>
+                            <code>select "relevant_events" where __timestamp__ >= 1h and fields__field_1="hello" and
+                                fields__field_2>=0</code></li>
                     </ul>
+
+                    <p class="text-danger"><i class="glyphicon glyphicon-alert"></i> Check the documentation for more
+                        info.</p>
 
                 </div>
             </div>
@@ -67,6 +70,33 @@
         $("#table-area").empty();
         $("#query-error").hide();
 
+        var getEventFields = function (data) {
+            if (!data.length) {
+                return []
+            }
+            var values = data[0].values;
+            var keys = [];
+            for (name in values) {
+                if (!values.hasOwnProperty(name)) {
+                    continue;
+                }
+                keys.push(name)
+            }
+            return keys
+        };
+
+        var getColumnDefinitions = function (fieldNames) {
+            var columns = [];
+            console.log(fieldNames);
+            for (var i = 0; i < fieldNames.length; i++) {
+                columns.push({data: "values." + fieldNames[i], title: fieldNames[i]});
+                console.log(fieldNames[i]);
+            }
+            columns.push({data: "source", title: "Source"});
+            columns.push({data: "timestamp", title: "Timestamp"});
+            return columns
+        };
+
         pymicroserviceMethodCall({
             method: 'query_events',
             params: {
@@ -78,17 +108,15 @@
                     $("#query-error-msg").text(JSON.stringify(data.error));
                 }
                 else {
-                    console.log(data.result);
                     $("#table-area").append($("<table id='data-table' class='table'></table>"));
+
+                    var eventFields = getEventFields(data.result);
+                    var columns = getColumnDefinitions(eventFields);
 
                     $("#data-table").dataTable({
                         data: data.result,
-                        columns: [
-                            {data: 'values', title: 'values'},
-                            {data: 'source', title: 'source'},
-                            {data: 'timestamp', title: 'timestamp'}
-                        ]
-                    })
+                        columns: columns
+                    });
                 }
             }
         })
