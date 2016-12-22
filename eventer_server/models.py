@@ -1,3 +1,4 @@
+import urllib.parse
 import datetime
 import ast
 import json
@@ -8,7 +9,22 @@ from mongoengine import connect, Document, EmbeddedDocument, ReferenceField, Str
 
 from eventer_server.lib.util import str_interval_to_datetime
 
-connect("eventer")
+
+def set_db_parameters(db_url):
+    parse_result = urllib.parse.urlparse(db_url)
+    if parse_result.scheme != "mongo":
+        raise ValueError("Invalid scheme: {}".format(parse_result.scheme))
+
+    if not parse_result.hostname:
+        hostname = "127.0.0.1"
+    else:
+        hostname = parse_result.hostname
+
+    if not parse_result.port:
+        port = 27017
+    else:
+        port = parse_result.port
+    connect(db=parse_result.path.lstrip("/"), host=hostname, port=port)
 
 
 class Project(Document):
@@ -122,7 +138,7 @@ class Event(Document):
         print(query_params)
         category = EventCategory.objects.get(name=query_parse_result.category)
 
-        target_datetime =query_params["__timestamp__"]
+        target_datetime = query_params["__timestamp__"]
         del query_params["__timestamp__"]
         events = cls.objects(Q(category=category) & Q(timestamp__gte=target_datetime) & Q(**query_params)).all()
         return events

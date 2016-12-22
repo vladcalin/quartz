@@ -5,6 +5,7 @@ import datetime
 
 from tornado.web import RequestHandler
 from tornado.gen import coroutine
+import click
 
 from pymicroservice.core.microservice import PyMicroService
 from pymicroservice.core.decorators import public_method, private_api_method
@@ -13,7 +14,7 @@ from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHand
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
     ViewEventCategory
 from eventer_server.lib.query import QueryParser
-from eventer_server.models import Project, FieldSpecs, EventCategory, Event
+from eventer_server.models import Project, FieldSpecs, EventCategory, Event, set_db_parameters
 
 
 class EventerService(PyMicroService):
@@ -50,9 +51,12 @@ class EventerService(PyMicroService):
     service_registry_urls = []
     service_registry_ping_interval = 30
 
-    def __init__(self):
-        self._values = {}
+    def __init__(self, host, port, registry):
         super(EventerService, self).__init__()
+        self.host = host
+        self.port = port
+        self.service_registry_urls = [registry]
+
 
     @public_method
     def create_project(self, name, description, owner):
@@ -116,6 +120,13 @@ class EventerService(PyMicroService):
         return True
 
 
-def main():
-    service = EventerService()
+@click.command("run")
+@click.option("--host", default="0.0.0.0", help="address to bind to")
+@click.option("--port", default="8080", help="port to bind to")
+@click.option("--registry", help="service registry to be used")
+@click.option("--db", default="mongo://localhost:27017/eventer", help="mongodb server to be used. Uses the 'eventer' database")
+def main(host, port, registry, db):
+    set_db_parameters(db)
+    service = EventerService(host, port, registry)
     service.start()
+
