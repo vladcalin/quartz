@@ -17,6 +17,9 @@
             <p><strong>Total events: </strong>{{event_count}}</p>
             <p><strong>Last event submitted: </strong>{{last_submit_time}}</p>
             <p><strong>Last event's source: </strong>{{last_submit_source}}</p>
+            <p>
+                <a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%2024h"><button class="btn btn-default">View from last 24h</button></a>
+            </p>
         </div>
     </div>
 

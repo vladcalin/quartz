@@ -55,7 +55,8 @@ class EventerService(PyMicroService):
         super(EventerService, self).__init__()
         self.host = host
         self.port = port
-        self.service_registry_urls = [registry]
+        if registry:
+            self.service_registry_urls = [registry]
 
 
     @public_method
@@ -122,7 +123,7 @@ class EventerService(PyMicroService):
 
 @click.command("run")
 @click.option("--host", default="0.0.0.0", help="address to bind to")
-@click.option("--port", default="8080", help="port to bind to")
+@click.option("--port", default=8080, help="port to bind to", type=int)
 @click.option("--registry", help="service registry to be used")
 @click.option("--db", default="mongo://localhost:27017/eventer", help="mongodb server to be used. Uses the 'eventer' database")
 def main(host, port, registry, db):

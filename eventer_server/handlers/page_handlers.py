@@ -59,7 +59,10 @@ class EventTypesHandler(RequestHandler):
 class EventsHandler(RequestHandler):
     @coroutine
     def get(self):
-        self.render("events.html", version=__version__, require_morris=False, require_datatable=False)
+        initial_query = self.get_argument("query", None)
+
+        self.render("events.html", version=__version__, require_morris=False, require_datatable=False,
+                    initial_query=initial_query)
 
 
 class StatusHandler(RequestHandler):

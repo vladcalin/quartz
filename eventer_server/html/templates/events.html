@@ -46,7 +46,11 @@
                 <label for="query" class="control-label">Query</label>
 
                 <div class="input-group">
-                    <input type="text" class="form-control" id="query" style="font-family: consolas;">
+                    <input type="text" class="form-control" id="query" style="font-family: consolas;"
+                    {% if initial_query %}
+                           value="{{initial_query}}"
+                           {% end %}
+                    >
 
                     <div class="input-group-btn">
                         <button class="btn btn-success" id="run-query">Run query</button>
@@ -64,43 +68,38 @@
 </div>
 
 <script>
-    $("#run-query").on('click', function (event) {
-        event.preventDefault();
-
-        $("#table-area").empty();
-        $("#query-error").hide();
-
-        var getEventFields = function (data) {
-            if (!data.length) {
-                return []
+    var getEventFields = function (data) {
+        if (!data.length) {
+            return []
+        }
+        var values = data[0].values;
+        var keys = [];
+        for (name in values) {
+            if (!values.hasOwnProperty(name)) {
+                continue;
             }
-            var values = data[0].values;
-            var keys = [];
-            for (name in values) {
-                if (!values.hasOwnProperty(name)) {
-                    continue;
-                }
-                keys.push(name)
-            }
-            return keys
-        };
+            keys.push(name)
+        }
+        return keys
+    };
 
-        var getColumnDefinitions = function (fieldNames) {
-            var columns = [];
-            console.log(fieldNames);
-            for (var i = 0; i < fieldNames.length; i++) {
-                columns.push({data: "values." + fieldNames[i], title: fieldNames[i]});
-                console.log(fieldNames[i]);
-            }
-            columns.push({data: "source", title: "Source"});
-            columns.push({data: "timestamp", title: "Timestamp"});
-            return columns
-        };
-
+    var getColumnDefinitions = function (fieldNames) {
+        var columns = [];
+        console.log(fieldNames);
+        for (var i = 0; i < fieldNames.length; i++) {
+            columns.push({data: "values." + fieldNames[i], title: fieldNames[i]});
+            console.log(fieldNames[i]);
+        }
+        columns.push({data: "source", title: "Source"});
+        columns.push({data: "timestamp", title: "Timestamp"});
+        return columns
+    };
+    var makeQuery = function (query) {
+        console.log(query);
         pymicroserviceMethodCall({
             method: 'query_events',
             params: {
-                query: $("#query").val()
+                query: query
             },
             onSuccess: function (data) {
                 if (data.error) {
@@ -121,7 +120,20 @@
             }
         })
 
-    })
+    };
+
+    $("#run-query").on('click', function (event) {
+        event.preventDefault();
+
+        $("#table-area").empty();
+        $("#query-error").hide();
+
+        makeQuery($("#query").val());
+    });
+
+    {% if initial_query %}
+        $("#run-query").click();
+    {% end %}
 </script>
 
 {% end %}
