@@ -5,12 +5,13 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" type="text/css" href="/static/css/vendor.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/flat-admin.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-flat.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-flat-extras.min.css">
 
+    <script src="/static/js/jquery-3.1.1.min.js"></script>
     <script src="/static/js/pymicroservice.js"></script>
-
-    <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 
     {% if require_morris %}
 
@@ -30,75 +31,58 @@
 
 </head>
 <body>
-<div class="app app-default">
+<div class="container">
 
-    <aside class="app-sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <a class="sidebar-brand" href="/dashboard"><span class="highlight">Eventer</span> {{version}}</a>
-        </div>
-        <div class="sidebar-menu">
-            <ul class="sidebar-nav">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/dashboard"><span class="highlight"><i
+                        class="glyphicon glyphicon-envelope"></i> Eventer</span> {{version}}</a>
+            </div>
+            <ul class="nav navbar-nav">
                 <li class="active">
                     <a href="/dashboard">
-                        <div class="icon">
-                            <i class="fa fa-tasks" aria-hidden="true"></i>
-                        </div>
-                        <div class="title">Dashboard</div>
+                        Dashboard
                     </a>
                 </li>
                 <li>
                     <a href="/projects">
-                        <div class="icon">
-                            <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                        </div>
                         <div class="title">Projects</div>
                     </a>
                 </li>
-                <li class="@@menu.events">
+                <li>
                     <a href="/events">
-                        <div class="icon">
-                            <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                        </div>
                         <div class="title">Events</div>
                     </a>
                 </li>
-                <li class="@@menu.events">
+                <li>
                     <a href="/status">
-                        <div class="icon">
-                            <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                        </div>
                         <div class="title">Status</div>
                     </a>
                 </li>
             </ul>
         </div>
-    </aside>
-
-    <div class="app-container">
+    </nav>
 
 
-        <div class="container">
+    <div class="container">
 
-            {% block "content" %}
-            {% end %}
+        {% block "content" %}
+        {% end %}
 
-        </div>
+    </div>
 
-        <footer class="app-footer">
-            <div class="row">
-                <div class="col-xs-12">
-                    <div class="footer-copyright">
-                        Copyright © 2016 - Eventer
-                    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="footer-copyright">
+                    Copyright © 2016 - Eventer
                 </div>
             </div>
-        </footer>
+        </div>
     </div>
 
 </div>
-
-<script type="text/javascript" src="/static/js/vendor.js"></script>
-<script type="text/javascript" src="/static/js/app.js"></script>
 
 </body>
 </html>

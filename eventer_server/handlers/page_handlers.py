@@ -61,7 +61,7 @@ class EventsHandler(RequestHandler):
     def get(self):
         initial_query = self.get_argument("query", None)
 
-        self.render("events.html", version=__version__, require_morris=False, require_datatable=False,
+        self.render("events.html", version=__version__, require_morris=False, require_datatable=True,
                     initial_query=initial_query)
 
 
