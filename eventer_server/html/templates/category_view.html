@@ -7,43 +7,34 @@
     <small>from project {{project.name}}</small>
 </h3>
 
-<div class="col-sm-12 col-xs-12">
 
-    <div class="card">
-        <div class="card-header">
-            General stats
-        </div>
-        <div class="card-body">
-            <p><strong>Total events: </strong>{{event_count}}</p>
-            <p><strong>Last event submitted: </strong>{{last_submit_time}}</p>
-            <p><strong>Last event's source: </strong>{{last_submit_source}}</p>
-            <p>
-                <a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%2024h"><button class="btn btn-default">View from last 24h</button></a>
-            </p>
-        </div>
-    </div>
+<h3>General stats</h3>
+<p><strong>Total events: </strong>{{event_count}}</p>
+<p><strong>Last event submitted: </strong>{{last_submit_time}}</p>
+<p><strong>Last event's source: </strong>{{last_submit_source}}</p>
 
-</div>
+<hr>
+
+<a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%201h"><button class="btn btn-default">View from last hour</button></a>
+<a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%2024h"><button class="btn btn-default">View from last 24h</button></a>
+<a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%2072h"><button class="btn btn-default">View from last three days</button></a>
+
+<hr>
 
 
 <div class="col-sm-12 col-xs-12">
-    <div class="card">
-        <div class="card-header">
-            Submitting events
-        </div>
-        <div class="card-body">
-            <div class="section">
-                <div class="section-body">
-                    <div role="tabpanel">
+    <h3><a href="#" onclick="$('#usage-info').toggle();">Submitting events</a></h3>
+    <div class="section" hidden id="usage-info">
+        <div class="section-body">
+            <div role="tabpanel">
                         <!-- Nav tabs -->
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li role="presentation" class="active"><a href="#raw_http" aria-controls="home" role="tab"
-                                                                      data-toggle="tab" aria-expanded="true">Raw HTTP
-                                requests</a>
-                            </li>
-                            <li role="presentation"><a href="#python" aria-controls="home" role="tab"
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#raw_http" aria-controls="home" role="tab"
+                                                              data-toggle="tab" aria-expanded="true">Raw HTTP requests</a>
+                    </li>
+                    <li role="presentation"><a href="#python" aria-controls="home" role="tab"
                                                        data-toggle="tab" aria-expanded="true">Using Python</a>
-                            </li>
+                    </li>
 
                         </ul>
                         <!-- Tab panes -->
@@ -73,9 +64,6 @@ event.submit()
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
