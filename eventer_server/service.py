@@ -58,7 +58,6 @@ class EventerService(PyMicroService):
         if registry:
             self.service_registry_urls = [registry]
 
-
     @public_method
     def create_project(self, name, description, owner):
         if not name or not description or not owner:
@@ -125,9 +124,9 @@ class EventerService(PyMicroService):
 @click.option("--host", default="0.0.0.0", help="address to bind to")
 @click.option("--port", default=8080, help="port to bind to", type=int)
 @click.option("--registry", help="service registry to be used")
-@click.option("--db", default="mongo://localhost:27017/eventer", help="mongodb server to be used. Uses the 'eventer' database")
+@click.option("--db", default="mongo://localhost:27017/eventer",
+              help="mongodb server to be used. Uses the 'eventer' database")
 def main(host, port, registry, db):
     set_db_parameters(db)
     service = EventerService(host, port, registry)
     service.start()
-

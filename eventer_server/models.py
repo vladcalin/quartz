@@ -111,36 +111,28 @@ class Event(Document):
         :param parse_result:
         :return:
         """
-        query_params = {}
-        for key, operator, value in query_parse_result.filters:
-            if key == "__timestamp__":
-                query_params["__timestamp__"] = str_interval_to_datetime(value)
-                continue
-            current_key = key
-            if operator == "=":
-                pass
-            elif operator == ">":
-                current_key += "__gt"
-            elif operator == ">=":
-                current_key += "__gte"
-            elif operator == "<":
-                current_key += "__lt"
-            elif operator == "<=":
-                current_key += "__lte"
-            else:
-                raise ValueError("Invalid operator: {}".format(operator))
+        operator_sign_to_string = {
+            "=": "",
+            ">": "__gt",
+            "<": "__lt",
+            ">=": "__gte",
+            "<=": "__lte"
+        }
+        metadata_fields = {
+            "__timestamp__": "timestamp",
+            "__source__": "source"
+        }
 
-            try:
-                query_params[current_key] = json.loads(value)
-            except Exception as e:
-                query_params[current_key] = value
+        print(query_parse_result)
+        category = EventCategory.objects.get(name=query_parse_result.category_name)
 
-        print(query_params)
-        category = EventCategory.objects.get(name=query_parse_result.category)
+        final_clauses = {}
+        for clause in query_parse_result.clauses:
+            key = metadata_fields.get(clause.name, clause.name)
+            key += operator_sign_to_string[clause.operator]
+            final_clauses[key] = clause.value
 
-        target_datetime = query_params["__timestamp__"]
-        del query_params["__timestamp__"]
-        events = cls.objects(Q(category=category) & Q(timestamp__gte=target_datetime) & Q(**query_params)).all()
+        events = cls.objects(Q(**final_clauses) & Q(category=category)).all()
         return events
 
 
