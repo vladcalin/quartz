@@ -4,7 +4,7 @@ import argparse
 import datetime
 import time
 
-from tornado.web import RequestHandler
+from tornado.web import RequestHandler, RedirectHandler
 from tornado.gen import coroutine
 import click
 
@@ -13,7 +13,7 @@ from pymicroservice.core.decorators import public_method, private_api_method
 
 from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHandler, PlotsHandler, EventsHandler, \
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
-    ViewEventCategory
+    ViewEventCategory, AboutHandler
 from eventer_server.lib.query import QueryParser
 from eventer_server.models import Project, FieldSpecs, EventCategory, Event, set_db_parameters, QueryHistory
 
@@ -37,6 +37,8 @@ class EventerService(PyMicroService):
         ("/events", EventsHandler),
         ("/status", StatusHandler),
         ("/projects/create", CreateProjectHandler),
+        ("/about", AboutHandler),
+        ("/", RedirectHandler, {"url": "/about"}),
     ]
 
     root_directory = os.path.dirname(os.path.abspath(__file__))
@@ -108,18 +110,19 @@ class EventerService(PyMicroService):
 
     @public_method
     def query_events(self, query):
-        parse_result = QueryParser().parse_query(query)
         _start = time.time()
+        parse_result = QueryParser().parse_query(query)
         events = Event.filter_by_query(parse_result)
+        to_return = [{
+                         "timestamp": event.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                         "values": event.values,
+                         "source": event.source
+                     } for event in events]
         _duration = time.time() - _start
 
         QueryHistory.create_new("unknown", query, events, _duration)
 
-        return [{
-                    "timestamp": event.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-                    "values": event.values,
-                    "source": event.source
-                } for event in events]
+        return to_return
 
     # Implement your token validation logic
     def api_token_is_valid(self, api_token):

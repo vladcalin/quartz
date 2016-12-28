@@ -47,7 +47,7 @@ class Clauses(List):
 
 class Query(List):
     grammar = "select", maybe_some(whitespace), \
-              '"', attr("category", word), '"', maybe_some(whitespace), \
+              '"', attr("category", re.compile("[^\"]+")), '"', maybe_some(whitespace), \
               'where', maybe_some(whitespace), attr("clauses", Clauses)
 
 

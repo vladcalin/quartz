@@ -18,7 +18,7 @@
                 <div class="panel-body" id="sample-queries" hidden>
 
                     <div class="alert alert-danger">
-                    <p class="text-danger"><i class="glyphicon glyphicon-alert"></i> Check the documentation for more
+                    <p><i class="glyphicon glyphicon-alert"></i> Check the documentation for more
                         info.</p>
                     </div>
                 </div>
@@ -90,13 +90,14 @@
         return columns
     };
     var makeQuery = function (query) {
-        console.log(query);
+        $("#run-query").attr("disabled", true);
         pymicroserviceMethodCall({
             method: 'query_events',
             params: {
                 query: query
             },
             onSuccess: function (data) {
+                $("#run-query").attr("disabled", false);
                 if (data.error) {
                     $("#query-error").show();
                     $("#query-error-msg").text(JSON.stringify(data.error));

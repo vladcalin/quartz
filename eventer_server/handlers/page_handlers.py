@@ -41,6 +41,12 @@ class DashboardHandler(RequestHandler):
                     projects=ordered, event_count=event_count, event_category_count=event_category_count)
 
 
+class AboutHandler(RequestHandler):
+    @coroutine
+    def get(self):
+        self.render("about.html", version=__version__, require_plots=False, require_datatable=False)
+
+
 class ProjectsHandler(RequestHandler):
     @coroutine
     def get(self):
