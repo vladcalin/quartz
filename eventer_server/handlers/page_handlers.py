@@ -11,7 +11,7 @@ from tornado.web import RequestHandler, HTTPError
 from tornado.gen import coroutine
 
 from eventer_server import __version__
-from eventer_server.models import Project, EventCategory, FieldSpecs, Event
+from eventer_server.models import Project, EventCategory, FieldSpecs, Event, QueryHistory
 
 ProjectMock = namedtuple("Project", "name description owner category_count event_count last_event_humanized")
 
@@ -36,7 +36,7 @@ class DashboardHandler(RequestHandler):
         event_category_count = sum([x.event_category_count for x in projects])
         event_count = Event.objects.count()
 
-        self.render("dashboard.html", version=__version__, require_morris=True, require_datatable=False,
+        self.render("dashboard.html", version=__version__, require_plots=True, require_datatable=False,
                     project_count=len(projects),
                     projects=ordered, event_count=event_count, event_category_count=event_category_count)
 
@@ -46,23 +46,24 @@ class ProjectsHandler(RequestHandler):
     def get(self):
         projects = yield _executor.submit(Project.objects.all())
 
-        self.render("projects.html", version=__version__, require_morris=False, require_datatable=True,
+        self.render("projects.html", version=__version__, require_plots=False, require_datatable=True,
                     projects=projects)
 
 
-class EventTypesHandler(RequestHandler):
+class PlotsHandler(RequestHandler):
     @coroutine
     def get(self):
-        self.render("event_types.html", version=__version__, require_morris=False, require_datatable=False)
+        self.render("plots.html", version=__version__, require_plots=True, require_datatable=False)
 
 
 class EventsHandler(RequestHandler):
     @coroutine
     def get(self):
         initial_query = self.get_argument("query", None)
+        history = QueryHistory.get_last_queries(10)
 
-        self.render("events.html", version=__version__, require_morris=False, require_datatable=True,
-                    initial_query=initial_query)
+        self.render("events.html", version=__version__, require_plots=False, require_datatable=True,
+                    initial_query=initial_query, history=history)
 
 
 class StatusHandler(RequestHandler):
@@ -85,7 +86,7 @@ class StatusHandler(RequestHandler):
         event_count = event_stats["count"]
         event_avg_size = humanize.naturalsize(event_stats["avgObjSize"])
 
-        self.render("status.html", version=__version__, require_morris=True, require_datatable=False,
+        self.render("status.html", version=__version__, require_plots=True, require_datatable=False,
 
                     project_size=project_size, project_index_size=project_index_size,
                     category_size=category_size, category_index_size=category_index_size,
@@ -96,7 +97,7 @@ class StatusHandler(RequestHandler):
 class CreateProjectHandler(RequestHandler):
     @coroutine
     def get(self):
-        self.render("create_project.html", version=__version__, require_morris=False, require_datatable=False)
+        self.render("create_project.html", version=__version__, require_plots=False, require_datatable=False)
 
 
 class ViewProjectHandler(RequestHandler):
@@ -107,7 +108,7 @@ class ViewProjectHandler(RequestHandler):
             categories = yield _executor.submit(EventCategory.objects, project=proj_id)
         except DoesNotExist:
             raise HTTPError(404)
-        self.render("project_view.html", version=__version__, require_morris=False, require_datatable=False,
+        self.render("project_view.html", version=__version__, require_plots=False, require_datatable=False,
                     project=project, categories=categories)
 
 
@@ -118,7 +119,7 @@ class EditProjectHandler(RequestHandler):
             project = yield _executor.submit(Project.objects.get, id=proj_id)
         except DoesNotExist:
             raise HTTPError(404)
-        self.render("project_edit.html", version=__version__, require_morris=False, require_datatable=False,
+        self.render("project_edit.html", version=__version__, require_plots=False, require_datatable=False,
                     project=project)
 
 
@@ -129,7 +130,7 @@ class CreateEventCategoryHandler(RequestHandler):
             project = yield _executor.submit(Project.objects.get, id=proj_id)
         except DoesNotExist:
             raise HTTPError(404)
-        self.render("create_category.html", version=__version__, require_morris=False, require_datatable=False,
+        self.render("create_category.html", version=__version__, require_plots=False, require_datatable=False,
                     project=project)
 
 
@@ -145,7 +146,7 @@ class ViewEventCategory(RequestHandler):
                 Event.objects(category=event_category).only('timestamp', 'source').order_by("-timestamp").first)
         except DoesNotExist:
             raise HTTPError(404)
-        self.render("category_view.html", version=__version__, require_morris=False, require_datatable=True,
+        self.render("category_view.html", version=__version__, require_plots=False, require_datatable=True,
                     project=project, event_category=event_category, event_count=total_events,
                     last_submit_time=(
                         humanize.naturaltime(last_submitted_event.timestamp) if last_submitted_event else "No events"),

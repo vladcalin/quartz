@@ -1,0 +1,140 @@
+projects.html{% extends "template.html" %}
+
+
+{% block "content" %}
+
+<h3>Plots</h3>
+
+<p>Check the documentation of plots to see what parameters are important</p>
+
+<h5>Plot options</h5>
+
+<div class="radio">
+    <label>
+        <input type="radio" name="plot-type" checked> Line graph (values are required to be numbers)
+    </label>
+</div>
+
+<div class="radio">
+    <label>
+        <input type="radio" name="plot-type"> Pie chart (no value restrictions)
+    </label>
+</div>
+
+<hr>
+
+<div class="row">
+    Plot data queries (maximum of 5):
+</div>
+
+<div class="row">
+    <div class="form-group col-lg-6">
+        <label class="control-label">Query #1</label>
+        <input type="text" class="form-control">
+    </div>
+
+    <div class="form-group col-lg-6">
+        <label class="control-label">Query #2</label>
+        <input type="text" class="form-control">
+    </div>
+
+    <div class="form-group col-lg-6">
+        <label class="control-label">Query #3</label>
+        <input type="text" class="form-control">
+    </div>
+
+    <div class="form-group col-lg-6">
+        <label class="control-label">Query #4</label>
+        <input type="text" class="form-control">
+    </div>
+
+    <div class="form-group col-lg-6">
+        <label class="control-label">Query #5</label>
+        <input type="text" class="form-control">
+    </div>
+
+
+</div>
+
+<div class="row">
+    <button class="btn btn-primary" onclick="triggerVisualizeData();" id="submit-btn">Visualize data</button>
+</div>
+
+<div class="row">
+    <div id="chart"></div>
+</div>
+
+
+<script>
+    var timestampRegex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/;
+
+    var timestampStringToDate = function (timestamp) {
+        var items = timestampRegex.exec(timestamp);
+        return new Date(items[1], items[2], items[3], items[4], items[5], items[6]);
+    };
+
+
+    function showLoading() {
+        $("#submit-btn").attr("disabled", true);
+    }
+
+    function hideLoading() {
+        $("#submit-btn").attr("disabled", false);
+    }
+
+
+    var triggerVisualizeData = function () {
+
+        showLoading();
+
+        setTimeout(hideLoading, 2000);
+    };
+
+    timestampStringToDate("2016-12-20 17:33:19");
+    timestampStringToDate("2016-12-20 17:33:22");
+
+    var data = [
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 19), "source": "vcalin", "count": 10},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 20), "source": "vcalin", "count": 20},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 21), "source": "vcalin", "count": 30},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 22), "source": "vcalin", "count": 10},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 23), "source": "vcalin", "count": 20},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 24), "source": "vcalin", "count": 30},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 25), "source": "vcalin", "count": 10},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 26), "source": "vcalin", "count": 20},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 27), "source": "vcalin", "count": 30}
+    ];
+
+    var data2 = [
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 19), "source": "vcalin", "count": 20},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 20), "source": "vcalin", "count": 30},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 21), "source": "vcalin", "count": 40},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 22), "source": "vcalin", "count": 20},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 23), "source": "vcalin", "count": 30},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 24), "source": "vcalin", "count": 40},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 25), "source": "vcalin", "count": 20},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 26), "source": "vcalin", "count": 30},
+        {"timestamp": new Date(2016, 12, 20, 17, 33, 27), "source": "vcalin", "count": 100}
+    ];
+
+    var colors = ["#1abc9c", "#e74c3c", "#3498db", "#f1c40f", "#2c3e50"];
+
+    var chart = d3.timeseries()
+            .addSerie(data, {x: "timestamp", y: "count"}, {
+                interpolate: "linear",
+                color: colors[0],
+                label: "items1.count"
+            })
+            .addSerie(data2, {x: "timestamp", y: "count"}, {
+                interpolate: "linear",
+                color: colors[1],
+                label: "items2.count"
+            })
+            .width(900);
+
+    chart("#chart");
+
+</script>
+
+{% end %}
+

@@ -9,48 +9,43 @@
     <div class="card">
         <div class="card-body">
 
-            <h4>Event query
-                <small>(must be of the same type)</small>
-            </h4>
+            <h4>Event query</h4>
 
             <div class="panel panel-default">
                 <div class="panel-heading" style="padding: 10px;">
                     Example query <a href="#" class="text-success pull-right" onclick="$('#sample-queries').toggle()">Show</a>
                 </div>
                 <div class="panel-body" id="sample-queries" hidden>
-                    <ul>
-                        <li><p>Example query for events from the last 24h from the event category
-                            Category1:</p>
-                            <code>select "Category1" where __timestamp__ >= 24h</code></li>
-                        <li><p>Example query for events from the last 15 minutes from the event category
-                            events_category_01:</p>
-                            <code>select "events_category_01" where __timestamp__ >= 15m</code>
-                            (note that 15m means 15 minutes, 24h means 24 hours)
-                        </li>
-                        <li><p>Example query for events from the category relevant_events from the last 10 minutes with
-                            the field "count" equal to 10</p>
-                            <code>select "relevant_events" where __timestamp__ >= 10m and values__count=10</code></li>
-                        <li>p>Examplq query for events from the category relevant_events from the last hour with the
-                            fields
-                            field_1 equal to "hello" and field_2 greater or equal than 0</p>
-                            <code>select "relevant_events" where __timestamp__ >= 1h and values__field_1="hello" and
-                                values__field_2>=0</code></li>
-                    </ul>
 
+                    <div class="alert alert-danger">
                     <p class="text-danger"><i class="glyphicon glyphicon-alert"></i> Check the documentation for more
                         info.</p>
-
+                    </div>
                 </div>
             </div>
+
+             <div class="panel panel-default">
+                <div class="panel-heading" style="padding: 10px;">
+                    Last 10 queries <a href="#" class="text-success pull-right" onclick="$('#query-history').toggle()">Show</a>
+                </div>
+                <div class="panel-body" id="query-history" hidden>
+                    <ul>
+                    {% for query in history %}
+                        <li><code>{{query.query}}</code> which yielded {{query.result_count}} results ({{query.runtime}} seconds) - {{query.humanized_timestamp}}</li>
+                    {% end %}
+                    </ul>
+                </div>
+             </div>
+
             <div class="form-group">
                 <label for="query" class="control-label">Query</label>
 
                 <div class="input-group">
                     <input type="text" class="form-control" id="query" style="font-family: consolas;"
-                    {% if initial_query %}
+                           {% if initial_query %}
                            value="{{initial_query}}"
                            {% end %}
-                    >
+                            >
 
                     <div class="input-group-btn">
                         <button class="btn btn-success" id="run-query">Run query</button>
@@ -113,8 +108,12 @@
                     var columns = getColumnDefinitions(eventFields);
 
                     $("#data-table").dataTable({
+                        dom: 'Bfrtip',
                         data: data.result,
-                        columns: columns
+                        columns: columns,
+                        buttons: [
+                            'copy', 'csv', 'excel', 'pdf'
+                        ]
                     });
                 }
             }
@@ -131,9 +130,7 @@
         makeQuery($("#query").val());
     });
 
-    {% if initial_query %}
-        $("#run-query").click();
-    {% end %}
+    {% if initial_query %} $("#run-query").click(); {% end %}
 </script>
 
 {% end %}

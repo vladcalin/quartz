@@ -2,6 +2,7 @@ import os
 import logging
 import argparse
 import datetime
+import time
 
 from tornado.web import RequestHandler
 from tornado.gen import coroutine
@@ -10,11 +11,11 @@ import click
 from pymicroservice.core.microservice import PyMicroService
 from pymicroservice.core.decorators import public_method, private_api_method
 
-from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHandler, EventTypesHandler, EventsHandler, \
+from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHandler, PlotsHandler, EventsHandler, \
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
     ViewEventCategory
 from eventer_server.lib.query import QueryParser
-from eventer_server.models import Project, FieldSpecs, EventCategory, Event, set_db_parameters
+from eventer_server.models import Project, FieldSpecs, EventCategory, Event, set_db_parameters, QueryHistory
 
 
 class EventerService(PyMicroService):
@@ -32,7 +33,7 @@ class EventerService(PyMicroService):
         ("/projects/view/([a-f0-9]+)/categories/([a-f0-9]+)", ViewEventCategory),
         ("/dashboard", DashboardHandler),
         ("/projects", ProjectsHandler),
-        ("/event_types", EventTypesHandler),
+        ("/plots", PlotsHandler),
         ("/events", EventsHandler),
         ("/status", StatusHandler),
         ("/projects/create", CreateProjectHandler),
@@ -108,7 +109,12 @@ class EventerService(PyMicroService):
     @public_method
     def query_events(self, query):
         parse_result = QueryParser().parse_query(query)
+        _start = time.time()
         events = Event.filter_by_query(parse_result)
+        _duration = time.time() - _start
+
+        QueryHistory.create_new("unknown", query, events, _duration)
+
         return [{
                     "timestamp": event.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
                     "values": event.values,

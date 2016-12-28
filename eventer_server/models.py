@@ -5,7 +5,7 @@ import json
 
 import humanize
 from mongoengine import connect, Document, EmbeddedDocument, ReferenceField, StringField, BooleanField, DateTimeField, \
-    EmbeddedDocumentListField, BinaryField, DictField, Q
+    EmbeddedDocumentListField, BinaryField, DictField, Q, IntField, FloatField
 
 from eventer_server.lib.util import str_interval_to_datetime
 
@@ -66,12 +66,23 @@ class EventCategory(Document):
 
     fields = EmbeddedDocumentListField(FieldSpecs)
 
+    @property
+    def event_count(self):
+        return Event.objects(category=self).count()
+
 
 class Event(Document):
     category = ReferenceField(EventCategory, index=True)
     timestamp = DateTimeField(default=datetime.datetime.now)
     source = StringField(required=False)
     values = DictField()
+
+    meta = {
+        "indexes": [
+            "-timestamp",
+            "#category"
+        ]
+    }
 
     def set_values(self, **kwargs):
         values_dict = {}
@@ -134,6 +145,37 @@ class Event(Document):
 
         events = cls.objects(Q(**final_clauses) & Q(category=category)).all()
         return events
+
+
+class QueryHistory(Document):
+    from_ip = StringField()
+    query = StringField()
+    timestamp = DateTimeField(default=datetime.datetime.now)
+    result_count = IntField(default=0)
+    runtime = FloatField()
+
+    meta = {
+        "indexes": [
+            "-timestamp"
+        ]
+    }
+
+    @classmethod
+    def get_last_queries(cls, count=5):
+        return cls.objects().all().order_by("-timestamp").limit(count)
+
+    @classmethod
+    def create_new(cls, from_ip, query, results, runtime):
+        instance = cls()
+        instance.from_ip = from_ip
+        instance.query = query
+        instance.result_count = len(results)
+        instance.runtime = runtime
+        instance.save()
+
+    @property
+    def humanized_timestamp(self):
+        return humanize.naturaltime(self.timestamp)
 
 
 if __name__ == '__main__':

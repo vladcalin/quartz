@@ -13,11 +13,13 @@
     <script src="/static/js/pymicroservice.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 
-    {% if require_morris %}
+    {% if require_plots %}
 
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
-    <script src="http:///cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+    <link rel="stylesheet" href="/static/css/d3_timeseries.css">
+    <!--<script src="/static/js/d3.v4.min.js"></script>-->
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="/static/js/d3_timeseries.js"></script>
 
 
     {% end %}
@@ -25,7 +27,13 @@
     {% if require_datatable %}
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
+
     <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
+    <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js"></script>
 
     {% end %}
 
@@ -53,6 +61,11 @@
                 <li>
                     <a href="/events">
                         <div class="title">Events</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="/plots">
+                        <div class="title">Plots</div>
                     </a>
                 </li>
                 <li>
