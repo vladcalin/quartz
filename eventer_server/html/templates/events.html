@@ -13,14 +13,12 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading" style="padding: 10px;">
-                    Example query <a href="#" class="text-success pull-right" onclick="$('#sample-queries').toggle()">Show</a>
+                    Saved queries <a href="#" class="text-success pull-right" onclick="$('#saved-queries').toggle()">Show</a>
                 </div>
-                <div class="panel-body" id="sample-queries" hidden>
+                <div class="panel-body" id="saved-queries" hidden>
+                    <ul id="saved-queries-ul">
 
-                    <div class="alert alert-danger">
-                    <p><i class="glyphicon glyphicon-alert"></i> Check the documentation for more
-                        info.</p>
-                    </div>
+                    </ul>
                 </div>
             </div>
 
@@ -49,6 +47,7 @@
 
                     <div class="input-group-btn">
                         <button class="btn btn-success" id="run-query">Run query</button>
+                        <button class="btn btn-default" id="save-query">Save query for later visualisation</button>
                     </div>
                 </div>
             </div>
@@ -56,9 +55,6 @@
             <div class="alert alert-danger" id="query-error" hidden>An error occured: <span id="query-error-msg"></span>
             </div>
 
-            <div class="btn-group" id="toggle-column-vis">
-
-            </div>
 
             <div id="table-area"></div>
 
@@ -128,7 +124,7 @@
                             'copy', 'csv', 'excel', 'pdf'
                         ]
                     });
-                    
+
 //                    $("a.toggle-col").on('click', function (event) {
 //                        event.preventDefault();
 //                        var column = table.column($(this).attr("data-column"));
@@ -148,6 +144,40 @@
 
         makeQuery($("#query").val());
     });
+
+    function refreshSavedQueries() {
+        var queriesUl = $("#saved-queries-ul");
+        queriesUl.empty();
+        var queries = JSON.parse(window.localStorage.getItem("saved_queries"));
+        for (var i in queries) {
+            queriesUl.append("<li><code>" + queries[i] + "</code> <i class='glyphicon glyphicon-remove' onclick='removeSavedQuery(" + i + ");'></i></li>")
+        }
+    }
+
+    function removeSavedQuery(index) {
+        var items = JSON.parse(window.localStorage.getItem("saved_queries"));
+        items.splice(index, 1);
+        localStorage.setItem("saved_queries", JSON.stringify(items));
+        refreshSavedQueries();
+    }
+
+    $("#save-query").on('click', function (e) {
+        e.preventDefault();
+        var currentQuery = $("#query").val();
+
+        var currentItems = window.localStorage.getItem("saved_queries");
+        if (currentItems == undefined || currentItems == null) {
+            currentItems = [];
+        }
+        else {
+            currentItems = JSON.parse(currentItems);
+        }
+        currentItems.push(currentQuery);
+        window.localStorage.setItem("saved_queries", JSON.stringify(currentItems));
+        refreshSavedQueries();
+    });
+
+    refreshSavedQueries();
 
     {% if initial_query %} $("#run-query").click(); {% end %}
 </script>
