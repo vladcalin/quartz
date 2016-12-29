@@ -56,6 +56,10 @@
             <div class="alert alert-danger" id="query-error" hidden>An error occured: <span id="query-error-msg"></span>
             </div>
 
+            <div class="btn-group" id="toggle-column-vis">
+
+            </div>
+
             <div id="table-area"></div>
 
         </div>
@@ -106,9 +110,17 @@
                     $("#table-area").append($("<table id='data-table' class='table'></table>"));
 
                     var eventFields = getEventFields(data.result);
+
+//                    var toggleButtons = $("#toggle-column-vis");
+//                    for (var i = 0; i< eventFields.length; i++) {
+//                        toggleButtons.append(
+//                                $("<a class='btn btn-default toggle-col' href='#' data-column='" + i + "'>" + eventFields[i] + "</a>")
+//                        )
+//                    }
+
                     var columns = getColumnDefinitions(eventFields);
 
-                    $("#data-table").dataTable({
+                    var table = $("#data-table").DataTable({
                         dom: 'Bfrtip',
                         data: data.result,
                         columns: columns,
@@ -116,6 +128,12 @@
                             'copy', 'csv', 'excel', 'pdf'
                         ]
                     });
+                    
+//                    $("a.toggle-col").on('click', function (event) {
+//                        event.preventDefault();
+//                        var column = table.column($(this).attr("data-column"));
+//                        column.visible(!column.visible());
+//                    })
                 }
             }
         })

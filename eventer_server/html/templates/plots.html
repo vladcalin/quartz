@@ -27,35 +27,29 @@ projects.html{% extends "template.html" %}
     Plot data queries (maximum of 5):
 </div>
 
-<div class="row">
-    <div class="form-group col-lg-6">
-        <label class="control-label">Query #1</label>
-        <input type="text" class="form-control">
+
+<div id="queries">
+    <div class="row" data-id="1">
+        <div class="form-group col-lg-8">
+            <label class="control-label">Query #1</label>
+            <input type="text" class="form-control query">
+        </div>
+
+        <div class="form-group col-lg-3">
+            <label class="control-label">By field</label>
+            <input type="text" class="form-control field">
+        </div>
+
+        <div class="form-group col-lg-1">
+            <label class="control-label">Remove</label>
+            <button class="btn btn-danger" onclick="removeQuery('1')"><span class="glyphicon glyphicon-remove"></span>
+            </button>
+        </div>
     </div>
-
-    <div class="form-group col-lg-6">
-        <label class="control-label">Query #2</label>
-        <input type="text" class="form-control">
-    </div>
-
-    <div class="form-group col-lg-6">
-        <label class="control-label">Query #3</label>
-        <input type="text" class="form-control">
-    </div>
-
-    <div class="form-group col-lg-6">
-        <label class="control-label">Query #4</label>
-        <input type="text" class="form-control">
-    </div>
-
-    <div class="form-group col-lg-6">
-        <label class="control-label">Query #5</label>
-        <input type="text" class="form-control">
-    </div>
-
-
 </div>
-
+<div class="row">
+    <button class="btn btn default" onclick="createNewQueryForm();">Add new query</button>
+</div>
 <div class="row">
     <button class="btn btn-primary" onclick="triggerVisualizeData();" id="submit-btn">Visualize data</button>
 </div>
@@ -66,6 +60,41 @@ projects.html{% extends "template.html" %}
 
 
 <script>
+    var currentQueryId = 2;
+
+    var removeQuery = function (queryId) {
+        $("div[data-id='" + queryId + "']").detach();
+    };
+
+    var createNewQueryForm = function () {
+
+        if ($("#queries div.row").length == 5) {
+            alert("Too many queries");
+            return;
+        }
+
+        var queryId = currentQueryId;
+        currentQueryId++;
+
+        $("#queries").append($('<div class="row" data-id="' + queryId + '"> \
+        <div class="form-group col-lg-8"> \
+            <label class="control-label">Query</label> \
+            <input type="text" class="form-control query"> \
+        </div> \
+ \
+        <div class="form-group col-lg-3"> \
+            <label class="control-label">By field</label> \
+            <input type="text" class="form-control field"> \
+        </div> \
+ \
+        <div class="form-group col-lg-1"> \
+            <label class="control-label">Remove</label> \
+            <button class="btn btn-danger" onclick="removeQuery(\'' + queryId + '\')"><span class="glyphicon glyphicon-remove"></span></button> \
+        </div> \
+    </div>'));
+    };
+
+
     var timestampRegex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/;
 
     var timestampStringToDate = function (timestamp) {
