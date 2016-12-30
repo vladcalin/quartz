@@ -24,32 +24,19 @@ projects.html{% extends "template.html" %}
 <hr>
 
 <div class="row">
-    Plot data queries (maximum of 5):
+    <h4>Saved queries</h4>
+    <ul id="saved-queries">
+
+    </ul>
 </div>
 
-
-<div id="queries">
-    <div class="row" data-id="1">
-        <div class="form-group col-lg-8">
-            <label class="control-label">Query #1</label>
-            <input type="text" class="form-control query">
-        </div>
-
-        <div class="form-group col-lg-3">
-            <label class="control-label">By field</label>
-            <input type="text" class="form-control field">
-        </div>
-
-        <div class="form-group col-lg-1">
-            <label class="control-label">Remove</label>
-            <button class="btn btn-danger" onclick="removeQuery('1')"><span class="glyphicon glyphicon-remove"></span>
-            </button>
-        </div>
-    </div>
-</div>
 <div class="row">
-    <button class="btn btn default" onclick="createNewQueryForm();">Add new query</button>
+    <h4>Current queries</h4>
+    <ul id="current-queries">
+    </ul>
 </div>
+
+
 <div class="row">
     <button class="btn btn-primary" onclick="triggerVisualizeData();" id="submit-btn">Visualize data</button>
 </div>
@@ -60,40 +47,40 @@ projects.html{% extends "template.html" %}
 
 
 <script>
-    var currentQueryId = 2;
-
-    var removeQuery = function (queryId) {
-        $("div[data-id='" + queryId + "']").detach();
-    };
-
-    var createNewQueryForm = function () {
-
-        if ($("#queries div.row").length == 5) {
-            alert("Too many queries");
-            return;
+    function toggleSavedQueries() {
+        var queriesStr = window.localStorage.getItem("saved_queries");
+        var queries = [];
+        if (queriesStr == null || queriesStr == undefined) {
+            queries = []
         }
+        else {
+            queries = JSON.parse(queriesStr);
+        }
+        for (var i in queries) {
+            $("#saved-queries").append($("<li data-query-id=" + i + "><code class='query'>" + queries[i] +
+                    "</code> by field <input type='text' class='field'>" +
+                    "<a onclick='addQuery(" + i + ")'><span class='btn btn-primary btn-xs'>Add</span></a></li>"))
+        }
+    }
+    toggleSavedQueries();
+    var globalCurrentQueries = 0;
 
-        var queryId = currentQueryId;
-        currentQueryId++;
+    function addQuery(index) {
+        var query = $("li[data-query-id='" + index + "'] .query").text();
+        var fieldElement = $("li[data-query-id='" + index + "'] .field");
+        var field = fieldElement.val();
+        $("#current-queries").append($('<li data-query="' + encodeURIComponent(query) + '" data-field="' + field +
+                '" data-id="' + globalCurrentQueries + '"><code>' + query + '</code> by field <code>' + field + '</code> <a \
+                onclick="removeCurrentQuery(' + globalCurrentQueries + ')" title="Remove"><i class="glyphicon glyphicon-remove"></i></a></li>'));
+        globalCurrentQueries ++;
+        fieldElement.val("");
+    }
 
-        $("#queries").append($('<div class="row" data-id="' + queryId + '"> \
-        <div class="form-group col-lg-8"> \
-            <label class="control-label">Query</label> \
-            <input type="text" class="form-control query"> \
-        </div> \
- \
-        <div class="form-group col-lg-3"> \
-            <label class="control-label">By field</label> \
-            <input type="text" class="form-control field"> \
-        </div> \
- \
-        <div class="form-group col-lg-1"> \
-            <label class="control-label">Remove</label> \
-            <button class="btn btn-danger" onclick="removeQuery(\'' + queryId + '\')"><span class="glyphicon glyphicon-remove"></span></button> \
-        </div> \
-    </div>'));
-    };
+    function removeCurrentQuery(i) {
+        $("#current-queries li[data-id='" + i + "']").detach();
+    }
 
+    var currentQueryId = 2;
 
     var timestampRegex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/;
 
