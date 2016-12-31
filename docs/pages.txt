@@ -1,0 +1,27 @@
+The menu should provide access to the following pages
+
+Landing page
+
+Home
+    Dashboard
+    Documentation
+
+Projects
+    Project listing
+        Project view
+            Project edit
+            Add event category
+            Project statistics
+            Edit project
+
+Events
+    Event stats
+    Event filtering (querying)
+    Event plotting
+    Manually add event
+
+Status
+    Machine status
+    Database status
+    Cleanup status
+
