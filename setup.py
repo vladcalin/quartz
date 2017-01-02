@@ -36,7 +36,7 @@ setup(
 
     entry_points={
         "console_scripts": [
-            "eventer = eventer_server.service:main"
+            "eventer = eventer_server.cli:cli"
         ]
     }
 )
