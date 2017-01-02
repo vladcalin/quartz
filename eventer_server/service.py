@@ -124,7 +124,13 @@ class EventerService(PyMicroService):
 
         return to_return
 
-    # Implement your token validation logic
+    @public_method
+    def query_events_for_field(self, query, field):
+        items = self.query_events(query)
+        return [{"timestamp": item["timestamp"], "value": item["values"][field]} for item in items]
+
+        # Implement your token validation logic
+
     def api_token_is_valid(self, api_token):
         return True
 

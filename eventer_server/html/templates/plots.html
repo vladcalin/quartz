@@ -11,13 +11,20 @@ projects.html{% extends "template.html" %}
 
 <div class="radio">
     <label>
-        <input type="radio" name="plot-type" checked> Line graph (values are required to be numbers)
+        <input type="radio" name="plot-type" checked value="line"> Line graph (values are required to be numbers)
     </label>
 </div>
 
 <div class="radio">
     <label>
-        <input type="radio" name="plot-type"> Pie chart (no value restrictions)
+        <input type="radio" name="plot-type" value="ts_line"> Timeseries line graph (values are required to be
+        numbers)
+    </label>
+</div>
+
+<div class="radio">
+    <label>
+        <input type="radio" name="plot-type" value="pie"> Pie chart (no value restrictions)
     </label>
 </div>
 
@@ -41,7 +48,13 @@ projects.html{% extends "template.html" %}
     <button class="btn btn-primary" onclick="triggerVisualizeData();" id="submit-btn">Visualize data</button>
 </div>
 
-<div class="row">
+<div class="row" id="error-box">
+    <div class="alert alert-danger">
+        <span id="error-msg"></span>
+    </div>
+</div>
+
+<div class="row" id="chart-box">
     <div id="chart"></div>
 </div>
 
@@ -64,11 +77,22 @@ projects.html{% extends "template.html" %}
     }
     toggleSavedQueries();
     var globalCurrentQueries = 0;
+    $("#error-box").hide();
+
+    function showError(m) {
+        $("#error-msg").text(m);
+        $("#error-box").show();
+    }
 
     function addQuery(index) {
         var query = $("li[data-query-id='" + index + "'] .query").text();
         var fieldElement = $("li[data-query-id='" + index + "'] .field");
+
         var field = fieldElement.val();
+        if (field == "") {
+            showError("Field name must not be empty");
+            return;
+        }
         $("#current-queries").append($('<li data-query="' + encodeURIComponent(query) + '" data-field="' + field +
                 '" data-id="' + globalCurrentQueries + '"><code>' + query + '</code> by field <code>' + field + '</code> <a \
                 onclick="removeCurrentQuery(' + globalCurrentQueries + ')" title="Remove"><i class="glyphicon glyphicon-remove"></i></a></li>'));
@@ -98,12 +122,103 @@ projects.html{% extends "template.html" %}
         $("#submit-btn").attr("disabled", false);
     }
 
+    function gatherQueries() {
+        var queryElements = $("li[data-query]");
+        var toReturn = [];
+        for (var i = 0; i <= queryElements.length; i++) {
+            if (queryElements[i] === undefined || queryElements[i] == null) {
+                continue;
+            }
+            var query = decodeURIComponent($(queryElements[i]).data("query"));
+            var field = $(queryElements[i]).data("field");
+            toReturn.push({query: query, field: field});
+        }
+        return toReturn;
+    }
+
+    function buildPlot(data) {
+        hideLoading();
+        var errors = [];
+        var oks = [];
+
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].error == null) {
+                oks.push(data[i]);
+            }
+            else {
+                errors.push(data[i]);
+            }
+        }
+        console.log(oks);
+        console.log(errors);
+
+        if (errors.length != 0) {
+            $("#error-msg").text(JSON.stringify(errors));
+            $("#error-box").show();
+        }
+
+        buildPlotWithData(oks, $("input[name='plot-type']").val());
+    }
+
+    function extractOnlyData(data) {
+        var toReturn = [];
+        for (var i = 0; i < data.length; i++) {
+            toReturn.push(["query_" + (i + 1)]);
+            for (var j = 0; j < data[i].result.length; j++) {
+                toReturn[i].push(data[i].result[j].value);
+            }
+        }
+        return toReturn;
+    }
+
+    function buildPlotWithData(data, plotType) {
+        // cleanup previous charts
+        var chartBox = $("#chart-box");
+        chartBox.empty();
+        chartBox.append($("<div id='chart'></div>"));
+
+        // build chart
+        switch (plotType) {
+            case "line":
+                var chartFields = extractOnlyData(data);
+                console.log(chartFields);
+                var chart = c3.generate({
+                    bindTo: "#chart",
+                    data: {
+                        columns: chartFields
+                    }
+                });
+                break;
+            case "ts_line":
+                console.log("ts_line");
+                break;
+            case "pie":
+                console.log("pie");
+                break;
+            default:
+                console.log("default");
+        }
+    }
+
 
     var triggerVisualizeData = function () {
 
         showLoading();
 
-        setTimeout(hideLoading, 2000);
+        var queries = gatherQueries();
+        var opts = {
+            calls: [],
+            onSuccess: buildPlot
+        };
+        for (var i = 0; i < queries.length; i++) {
+            opts.calls.push({
+                "method": "query_events_for_field",
+                "params": queries[i]
+            });
+        }
+
+        pymicroserviceBatchCall(opts);
+
     };
 
     timestampStringToDate("2016-12-20 17:33:19");
