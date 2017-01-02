@@ -22,7 +22,7 @@ def cli():
     pass
 
 
-@cli.command("start")
+@cli.command("start", help="The JSON configuration file with the parameters")
 @click.argument("config")
 def start(config):
     with open(config) as f:
@@ -43,6 +43,7 @@ SAMPLE_CONFIG = """{
 }"""
 
 
-@cli.command("get_sample_config")
+@cli.command("get_sample_config", help="Writes a sample configuration file to STDOUT. Can be used as template"
+                                       " for writing the actual configration file")
 def get_sample_config():
     print(SAMPLE_CONFIG)
