@@ -155,9 +155,10 @@ projects.html{% extends "template.html" %}
         if (errors.length != 0) {
             $("#error-msg").text(JSON.stringify(errors));
             $("#error-box").show();
+            return;
         }
 
-        buildPlotWithData(oks, $("input[name='plot-type']").val());
+        buildPlotWithData(oks, $("input[name='plot-type']:checked").val());
     }
 
     function extractOnlyData(data) {
@@ -171,18 +172,34 @@ projects.html{% extends "template.html" %}
         return toReturn;
     }
 
+    function extractDataWithTimestamp(data) {
+        var toReturn = [];
+        var ts = ["x"];
+        for (var i = 0; i < data.length; i++) {
+            toReturn.push(["query_" + (i + 1)]);
+            for (var j = 0; j < data[i].result.length; j++) {
+                toReturn[i].push(data[i].result[j].value);
+                var currentTs = data[i].result[j].timestamp;
+                ts.push(timestampStringToDate(currentTs));
+            }
+        }
+//        ts.push(new Date());
+        toReturn.push(ts);
+        return toReturn;
+    }
+
     function buildPlotWithData(data, plotType) {
         // cleanup previous charts
         var chartBox = $("#chart-box");
         chartBox.empty();
         chartBox.append($("<div id='chart'></div>"));
-
+        var chartFields, chart;
+        console.log(plotType);
         // build chart
         switch (plotType) {
             case "line":
-                var chartFields = extractOnlyData(data);
-                console.log(chartFields);
-                var chart = c3.generate({
+                chartFields = extractOnlyData(data);
+                chart = c3.generate({
                     bindTo: "#chart",
                     data: {
                         columns: chartFields
@@ -190,6 +207,24 @@ projects.html{% extends "template.html" %}
                 });
                 break;
             case "ts_line":
+                chartFields = extractDataWithTimestamp(data);
+                console.log(chartFields);
+                chart = c3.generate({
+                    bindTo: "#chart",
+                    data: {
+                        x: 'x',
+                        columns: chartFields
+                    },
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                            tick: {
+                                xFormat: '%Y-%m-%d %H:%M:%S',
+                                format: '%Y-%m-%d %H:%M:%S'
+                            }
+                        }
+                    }
+                });
                 console.log("ts_line");
                 break;
             case "pie":
