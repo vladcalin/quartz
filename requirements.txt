@@ -3,3 +3,4 @@ mongoengine
 pymicroservice
 humanize
 pypeg2
+pyfiglet
