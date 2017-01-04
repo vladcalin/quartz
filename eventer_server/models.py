@@ -143,7 +143,7 @@ class Event(Document):
             key += operator_sign_to_string[clause.operator]
             final_clauses[key] = clause.value
 
-        events = cls.objects(Q(**final_clauses) & Q(category=category)).all()
+        events = cls.objects(Q(**final_clauses) & Q(category=category)).order_by("timestamp").all()
         return events
 
 

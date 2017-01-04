@@ -8,25 +8,55 @@ projects.html{% extends "template.html" %}
 <p>Check the documentation of plots to see what parameters are important</p>
 
 <h5>Plot options</h5>
+<div class="row">
+    <div class="col-lg-6">
 
-<div class="radio">
-    <label>
-        <input type="radio" name="plot-type" checked value="line"> Line graph (values are required to be numbers)
-    </label>
+        <div class="radio" onclick="displayInfoPanel('line');">
+            <label>
+                <input type="radio" name="plot-type" checked value="line"> Line graph (values are required to be
+                numbers)
+            </label>
+        </div>
+
+        <div class="radio" onclick="displayInfoPanel('ts_line');">
+            <label>
+                <input type="radio" name="plot-type" value="ts_line"> Timeseries line graph (values are required to be
+                numbers)
+            </label>
+        </div>
+
+        <div class="radio" onclick="displayInfoPanel('pie');">
+            <label>
+                <input type="radio" name="plot-type" value="pie"> Pie chart (no value restrictions)
+            </label>
+        </div>
+
+    </div>
+    <div class="col-lg-6">
+        <div id="info_line" class="info-panel">
+            The <b>line</b> plot displays the desired value fluctuation in a equally distributed manner.
+        </div>
+        <div id="info_ts_line" class="info-panel">
+            The <b>timeseries line</b> plot displays the desired value fluctuation where the distance on <code>x</code>
+            axis is directly proportional to the time distance between the two events occured.
+        </div>
+        <div id="info_pie" class="info-panel">
+            The <b>pie</b> chart offers a graphical interpretation of the percent of values with equal values for the
+            given field, relative to the total queried events.
+        </div>
+    </div>
 </div>
 
-<div class="radio">
-    <label>
-        <input type="radio" name="plot-type" value="ts_line"> Timeseries line graph (values are required to be
-        numbers)
-    </label>
-</div>
+<script>
+    $("div.info-panel").hide();
+    $("div#info_line").show();
 
-<div class="radio">
-    <label>
-        <input type="radio" name="plot-type" value="pie"> Pie chart (no value restrictions)
-    </label>
-</div>
+    function displayInfoPanel(item) {
+        $("div.info-panel").hide();
+        $("div#info_" + item).show();
+    }
+</script>
+
 
 <hr>
 
