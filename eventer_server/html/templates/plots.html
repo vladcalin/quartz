@@ -179,8 +179,6 @@ projects.html{% extends "template.html" %}
                 errors.push(data[i]);
             }
         }
-        console.log(oks);
-        console.log(errors);
 
         if (errors.length != 0) {
             $("#error-msg").text(JSON.stringify(errors));
@@ -202,6 +200,31 @@ projects.html{% extends "template.html" %}
         return toReturn;
     }
 
+    function extractValueOccurences(data) {
+        var toReturnDict = {};
+        // currently only do this for the first query
+        var relevantData = data[0];
+        // build an object with each item frequency
+        for (var i = 0; i < relevantData.result.length; i++) {
+            var currentItem = relevantData.result[i].value;
+            if (!(currentItem in toReturnDict)) {
+                toReturnDict[currentItem] = 1
+            }
+            else {
+                toReturnDict[currentItem]++;
+            }
+        }
+        console.log(toReturnDict);
+        // convert the item to a list of lists
+        var toReturn = [];
+        for (var key in toReturnDict) {
+            if (toReturnDict.hasOwnProperty(key)) {
+                toReturn.push([key, toReturnDict[key]])
+            }
+        }
+        return toReturn;
+    }
+
     function extractDataWithTimestamp(data) {
         var toReturn = [];
         var ts = ["x"];
@@ -213,7 +236,6 @@ projects.html{% extends "template.html" %}
                 ts.push(timestampStringToDate(currentTs));
             }
         }
-//        ts.push(new Date());
         toReturn.push(ts);
         return toReturn;
     }
@@ -238,7 +260,6 @@ projects.html{% extends "template.html" %}
                 break;
             case "ts_line":
                 chartFields = extractDataWithTimestamp(data);
-                console.log(chartFields);
                 chart = c3.generate({
                     bindTo: "#chart",
                     data: {
@@ -255,10 +276,17 @@ projects.html{% extends "template.html" %}
                         }
                     }
                 });
-                console.log("ts_line");
                 break;
             case "pie":
-                console.log("pie");
+                chartFields = extractValueOccurences(data);
+                console.log(chartFields);
+                chart = c3.generate({
+                    bindTo: "#chart",
+                    data: {
+                        columns: chartFields,
+                        type: "pie"
+                    }
+                });
                 break;
             default:
                 console.log("default");
