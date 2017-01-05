@@ -21,22 +21,16 @@
                     <th>Owner</th>
                     <th>Event count</th>
                     <th>Last event</th>
-                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for project in projects %}
                 <tr>
-                    <td>{{ project.name }}</td>
+                    <td><a href="/projects/view/{{ project.id }}">{{ project.name }}</a></td>
                     <td>{{ project.description }}</td>
                     <td>{{ project.owner }}</td>
                     <td>{{ project.event_count() }}</td>
                     <td>{{ project.last_event_humanized() }}</td>
-                    <td>
-                        <a href="/projects/view/{{str(project.id)}}">
-                            <button class="btn btn-info btn-xs">View</button>
-                        </a>
-                    </td>
                 </tr>
                 {% end %}
                 </tbody>

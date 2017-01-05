@@ -44,6 +44,13 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
                 <a class="navbar-brand" href="/about"><span class="highlight"><i
                         class="glyphicon glyphicon-envelope"></i> Eventer</span> {{version}}</a>
             </div>
@@ -58,20 +65,33 @@
                         Dashboard
                     </a>
                 </li>
-                <li>
-                    <a href="/projects">
-                        <div class="title">Projects</div>
-                    </a>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Projects
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="/projects">View all</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/projects/create">Create new</a></li>
+                    </ul>
                 </li>
-                <li>
-                    <a href="/events">
-                        <div class="title">Events</div>
-                    </a>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Events
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <!--View events-->
+                        <li><a href="/events">Query events</a></li>
+                        <li><a href="/events/statistics">Statistics</a></li>
+                        <li class="divider"></li>
+                        <!--Modify events-->
+                        <li><a href="/events/import">Import data</a></li>
+                    </ul>
                 </li>
-                <li>
-                    <a href="/plots">
-                        <div class="title">Plots</div>
-                    </a>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Charts
+                        <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="/plots">Build plots</a></li>
+                    </ul>
                 </li>
                 <li>
                     <a href="/status">
