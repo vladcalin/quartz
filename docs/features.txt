@@ -1,0 +1,44 @@
+
+@priority(None)
+event data compressing
+    - line chart: compress(every_X_items, method)
+                        every_X_items => int
+                        method => "avg", "sum", "max", "min"
+    - timeseries line chart: compress(every_X_seconds, method)
+                                    every_X_seconds => int
+                                    method => "avg", "sum", "max", "min"
+    - pie chart => None
+
+@priority(10)
+data import
+    - from csv
+    - from json
+    - from xml
+
+@priority(9)
+data export
+    - chart as png
+    - chart as svg
+
+@priority(7)
+triggers
+    - trigger_condition => trigger_action
+
+    TriggerCondition
+        # time related
+        crontab_condition
+        # data related
+        f(value X) is Y
+        f(value X) < Y
+        f(value X) > Y
+        f => NoChange, Count, Sum, Min, Max
+
+    TriggerAction
+        send_email(to, template, context)
+        submit_event(category, **values)
+
+@priority(8)
+Raports
+    - uploadable Templates - default context => events("query")
+    - send to mail
+
