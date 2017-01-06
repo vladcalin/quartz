@@ -1,0 +1,8 @@
+tornado
+mongoengine
+pymicroservice
+humanize
+pypeg2
+pyfiglet
+sphinx
+sphinx_bootstrap_theme

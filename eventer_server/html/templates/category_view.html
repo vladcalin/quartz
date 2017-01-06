@@ -3,7 +3,7 @@
 
 {% block "content" %}
 
-<h3>Category <code>{{event_category.name}}</code>
+<h3>Category <u>{{event_category.name}}</u>
     <small>from project {{project.name}}</small>
 </h3>
 
@@ -15,9 +15,15 @@
 
 <hr>
 
-<a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%201h"><button class="btn btn-default">View from last hour</button></a>
-<a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%2024h"><button class="btn btn-default">View from last 24h</button></a>
-<a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%2072h"><button class="btn btn-default">View from last three days</button></a>
+<a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%201h">
+    <button class="btn btn-default">View from last hour</button>
+</a>
+<a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%2024h">
+    <button class="btn btn-default">View from last 24h</button>
+</a>
+<a href="/events?query=select%20%22{{event_category.name}}%22%20where%20__timestamp__%20%3E%3D%2072h">
+    <button class="btn btn-default">View from last three days</button>
+</a>
 
 <hr>
 

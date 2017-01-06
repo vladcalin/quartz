@@ -11,9 +11,9 @@
     <div class="col-lg-12">
         <h4>General actions</h4>
         <a href="/projects/view/{{project.id}}/edit">
-            <button class="btn btn-success btn-xs" id="edit-btn">Edit</button>
+            <button class="btn btn-success" id="edit-btn">Edit</button>
         </a>
-        <button class="btn btn-danger btn-xs" id="delete-btn" data-toggle="modal" data-target="#delete-confirm">
+        <button class="btn btn-danger" id="delete-btn" data-toggle="modal" data-target="#delete-confirm">
             Delete
         </button>
     </div>
@@ -23,7 +23,7 @@
     <div class="col-lg-12">
         <h4>Event categories</h4>
         <a href="/projects/view/{{project.id}}/create_category">
-            <button class="btn btn-success btn-xs">Add</button>
+            <button class="btn btn-success">Add</button>
         </a>
 
         <table class="table">
@@ -32,16 +32,14 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th>Event count</th>
-                <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             {% for category in categories %}
             <tr>
-                <td><code>{{category.name}}</code></td>
+                <td><a href="/projects/view/{{project.id}}/categories/{{category.id}}">{{category.name}}</a></td>
                 <td>{{category.description}}</td>
                 <td>{{category.event_count}}</td>
-                <td><a href="/projects/view/{{project.id}}/categories/{{category.id}}"><span class="label label-info">View</span></a>
                 </td>
             </tr>
             {% end %}
