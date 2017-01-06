@@ -6,6 +6,7 @@ import click
 
 from eventer_server.service import EventerService
 from eventer_server.models import set_db_parameters
+from eventer_server import __version__
 
 BANNER = """
     _____                 _
@@ -14,7 +15,8 @@ BANNER = """
     | |___ \ V /  __/ | | | ||  __/ | |_____\__ \  __/ |   \ V /  __/ |
     |_____| \_/ \___|_| |_|\__\___|_|       |___/\___|_|    \_/ \___|_|
 
-"""
+    Current version: {version}
+""".format(version=__version__)
 
 DEFAULTS = {
     "database_url": "mongo://localhost:27017/eventer",

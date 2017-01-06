@@ -1,0 +1,52 @@
+projects.html{% extends "template.html" %}
+
+
+{% block "content" %}
+
+<h3>Import data</h3>
+
+<div class="form-group">
+    <label for="category" class="control-label">Import data for category</label>
+    <select name="category" id="category" class="form-control">
+        {% for category in categories %}
+        <option value="{{ category.id }}">{{category.name}} (from project {{category.project.name}})</option>
+        {% end %}
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="file_type" class="control-label">Data source type</label>
+    <select name="file_type" id="file_type" class="form-control">
+        <option value="json">JSON</option>
+        <option value="csv">CSV</option>
+        <option value="xml">XML</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="file" class="control-label">Data source file</label>
+    <input type="file" class="form-control" id="file" name="file">
+</div>
+
+
+<div class="panel panel-warning">
+    <div class="panel-heading">
+        Caution
+    </div>
+    <div class="panel-body">
+        <p>When adding data from a file source, the generated events will have
+        their timestamp equal to the moment when they are inserted into
+        the database <br>
+        Therefore, all the inserted events' timestamps will span a few seconds
+        interval, making the generation of time series line charts messy.</p>
+    </div>
+</div>
+
+<button class="btn btn-success">Add data now</button>
+<button class="btn btn-danger" onclick="window.history.back();">Cancel</button>
+
+
+
+
+{% end %}
+

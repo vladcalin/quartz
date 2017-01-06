@@ -5,7 +5,7 @@ import json
 
 import humanize
 from mongoengine import connect, Document, EmbeddedDocument, ReferenceField, StringField, BooleanField, DateTimeField, \
-    EmbeddedDocumentListField, BinaryField, DictField, Q, IntField, FloatField
+    EmbeddedDocumentListField, BinaryField, DictField, Q, IntField, FloatField, CASCADE
 
 from eventer_server.lib.util import str_interval_to_datetime
 
@@ -62,7 +62,7 @@ class FieldSpecs(EmbeddedDocument):
 class EventCategory(Document):
     name = StringField(unique=True, required=True)
     description = StringField(default="")
-    project = ReferenceField(Project)
+    project = ReferenceField(Project, reverse_delete_rule=CASCADE)
 
     fields = EmbeddedDocumentListField(FieldSpecs)
 
@@ -72,7 +72,7 @@ class EventCategory(Document):
 
 
 class Event(Document):
-    category = ReferenceField(EventCategory, index=True)
+    category = ReferenceField(EventCategory, index=True, reverse_delete_rule=CASCADE)
     timestamp = DateTimeField(default=datetime.datetime.now)
     source = StringField(required=False)
     values = DictField()

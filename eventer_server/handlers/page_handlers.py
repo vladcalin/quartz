@@ -47,6 +47,26 @@ class AboutHandler(RequestHandler):
         self.render("about.html", version=__version__, require_plots=False, require_datatable=False)
 
 
+class DocsHandler(RequestHandler):
+    @coroutine
+    def get(self):
+        self.render("docs.html", version=__version__, require_plots=False, require_datatable=False)
+
+
+class EventsStatisticsHandler(RequestHandler):
+    @coroutine
+    def get(self):
+        self.render("events_statistics.html", version=__version__, require_plots=False, require_datatable=False)
+
+
+class ImportDataHandler(RequestHandler):
+    @coroutine
+    def get(self):
+        categories = yield _executor.submit(EventCategory.objects.all)
+        self.render("events_import_data.html", version=__version__, require_plots=False, require_datatable=False,
+                    categories=categories)
+
+
 class ProjectsHandler(RequestHandler):
     @coroutine
     def get(self):
@@ -90,7 +110,7 @@ class StatusHandler(RequestHandler):
         event_size = humanize.naturalsize(event_stats["storageSize"])
         event_index_size = humanize.naturalsize(event_stats["totalIndexSize"])
         event_count = event_stats["count"]
-        event_avg_size = humanize.naturalsize(event_stats["avgObjSize"])
+        event_avg_size = humanize.naturalsize(event_stats.get("avgObjSize", 0))
 
         self.render("status.html", version=__version__, require_plots=True, require_datatable=False,
 

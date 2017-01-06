@@ -9,7 +9,7 @@ from pymicroservice.core.decorators import public_method
 
 from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHandler, PlotsHandler, EventsHandler, \
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
-    ViewEventCategory, AboutHandler
+    ViewEventCategory, AboutHandler, DocsHandler, EventsStatisticsHandler, ImportDataHandler
 from eventer_server.lib.query import QueryParser
 from eventer_server.models import Project, FieldSpecs, EventCategory, Event, QueryHistory
 
@@ -31,9 +31,12 @@ class EventerService(PyMicroService):
         ("/projects", ProjectsHandler),
         ("/plots", PlotsHandler),
         ("/events", EventsHandler),
+        ("/events/statistics", EventsStatisticsHandler),
+        ("/events/import", ImportDataHandler),
         ("/status", StatusHandler),
         ("/projects/create", CreateProjectHandler),
         ("/about", AboutHandler),
+        ("/docs", DocsHandler),
         ("/", RedirectHandler, {"url": "/about"}),
     ]
 
