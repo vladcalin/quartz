@@ -1,6 +1,7 @@
 import os
 import time
 import json
+import base64
 
 from tornado.web import RedirectHandler
 
@@ -11,6 +12,8 @@ from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHand
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
     ViewEventCategory, AboutHandler, DocsHandler, EventsStatisticsHandler, ImportDataHandler
 from eventer_server.lib.query import QueryParser
+from eventer_server.lib.importers.json_importer import JsonImporter
+from eventer_server.lib.importers.xml_importer import XmlImporter
 from eventer_server.models import Project, FieldSpecs, EventCategory, Event, QueryHistory
 
 
@@ -128,7 +131,24 @@ class EventerService(PyMicroService):
         items = self.query_events(query)
         return [{"timestamp": item["timestamp"], "value": item["values"][field]} for item in items]
 
-        # Implement your token validation logic
+    @public_method
+    def import_event_data(self, category, source_type, content):
+        importers = {
+            "json": JsonImporter,
+            "xml": XmlImporter
+        }
 
+        if source_type not in ("csv", "xml", "json"):
+            raise ValueError("Invalid source_type. Only 'csv', 'xml' or 'json' supported")
+        category_obj = EventCategory.objects.get(id=category)
+        source_content = base64.b64decode(content.encode())
+        events = [ev for ev in importers[source_type](source_content, category_obj).iter_parsed_events()]
+
+        Event.objects.insert(events)
+        return {
+            "count": len(events)
+        }
+
+    # Implement your token validation logic
     def api_token_is_valid(self, api_token):
         return True

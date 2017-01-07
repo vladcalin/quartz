@@ -285,6 +285,13 @@ projects.html{% extends "template.html" %}
                     data: {
                         columns: chartFields,
                         type: "pie"
+                    },
+                    pie: {
+                        label: {
+                            format: function (value, ratio, id) {
+                                return parseFloat(ratio * 100).toFixed(1) + "% (" + value + ")";
+                            }
+                        }
                     }
                 });
                 break;

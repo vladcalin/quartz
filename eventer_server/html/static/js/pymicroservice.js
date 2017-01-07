@@ -51,3 +51,12 @@ var pymicroserviceBatchCall = function (opts) {
         success: onSuccess
     });
 };
+
+
+function bootstrapNotify(type, message) {
+    $.notify({
+        message: message
+    }, {
+        type: type
+    })
+}
