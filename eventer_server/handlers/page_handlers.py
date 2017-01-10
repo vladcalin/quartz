@@ -82,6 +82,12 @@ class PlotsHandler(RequestHandler):
         self.render("plots.html", version=__version__, require_plots=True, require_datatable=False)
 
 
+class PlotsPyplotHandler(RequestHandler):
+    @coroutine
+    def get(self):
+        self.render("plots_img.html", version=__version__, require_plots=False, require_datatable=False)
+
+
 class EventsHandler(RequestHandler):
     @coroutine
     def get(self):

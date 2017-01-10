@@ -10,11 +10,12 @@ from pymicroservice.core.decorators import public_method
 
 from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHandler, PlotsHandler, EventsHandler, \
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
-    ViewEventCategory, AboutHandler, DocsHandler, EventsStatisticsHandler, ImportDataHandler
+    ViewEventCategory, AboutHandler, DocsHandler, EventsStatisticsHandler, ImportDataHandler, PlotsPyplotHandler
 from eventer_server.lib.query import QueryParser
 from eventer_server.lib.importers.json_importer import JsonImporter
 from eventer_server.lib.importers.xml_importer import XmlImporter
 from eventer_server.models import Project, FieldSpecs, EventCategory, Event, QueryHistory
+from eventer_server.lib.pyplot_charter import PyplotCharter
 
 
 class EventerService(PyMicroService):
@@ -32,6 +33,7 @@ class EventerService(PyMicroService):
         ("/projects/view/([a-f0-9]+)/categories/([a-f0-9]+)", ViewEventCategory),
         ("/dashboard", DashboardHandler),
         ("/projects", ProjectsHandler),
+        ("/plots/pyplot", PlotsPyplotHandler),
         ("/plots", PlotsHandler),
         ("/events", EventsHandler),
         ("/events/statistics", EventsStatisticsHandler),
@@ -111,7 +113,7 @@ class EventerService(PyMicroService):
         return str(event.id)
 
     @public_method
-    def query_events(self, query):
+    def query_events(self, query, save_history=True):
         _start = time.time()
         parse_result = QueryParser().parse_query(query)
         events = Event.filter_by_query(parse_result)
@@ -122,7 +124,8 @@ class EventerService(PyMicroService):
                      } for event in events]
         _duration = time.time() - _start
 
-        QueryHistory.create_new("unknown", query, events, _duration)
+        if save_history:
+            QueryHistory.create_new("unknown", query, events, _duration)
 
         return to_return
 
@@ -133,6 +136,8 @@ class EventerService(PyMicroService):
 
     @public_method
     def import_event_data(self, category, source_type, content):
+        if source_type == "csv":
+            raise NotImplementedError()
         importers = {
             "json": JsonImporter,
             "xml": XmlImporter
@@ -148,6 +153,23 @@ class EventerService(PyMicroService):
         return {
             "count": len(events)
         }
+
+    @public_method
+    def build_pyplot_chart(self, query, title, by_field, chart_type):
+        result = {}
+        _time = time.time()
+        events = self.query_events(query, save_history=False)
+
+        result["query_duration"] = time.time() - _time
+        result["event_count"] = len(events)
+
+        _time = time.time()
+        plot_data = PyplotCharter(events).make_plot(by_field, chart_type, title)
+
+        result["chart_generation_duration"] = time.time() - _time
+        result["plot_image"] = plot_data
+
+        return result
 
     # Implement your token validation logic
     def api_token_is_valid(self, api_token):
