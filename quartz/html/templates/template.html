@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Eventer {{version}}</title>
+    <title>Quartz {{ version }}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/materialize.min.css">
     <link rel="stylesheet" type="text/css" href="/static/css/animate.css">
-    <!--<link rel="stylesheet" type="text/css" href="/static/css/bootstrap-flat.min.css">-->
-    <!--<link rel="stylesheet" type="text/css" href="/static/css/bootstrap-flat-extras.min.css">-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <script src="/static/js/jquery-3.1.1.min.js"></script>
-    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/materialize.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap-notify.min.js"></script>
     <script src="/static/js/pymicroservice.js"></script>
 
@@ -41,94 +40,57 @@
 
 </head>
 <body>
+
+<nav class="blue-grey lighten-3">
+    <div class="container">
+        <a href="#" class="brand-logo">quartz - {{ version }}</a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href="/about">About</a></li>
+            <li><a href="/docs">Documentation</a></li>
+            <li><a class='dropdown-button' href='#' data-activates='projects-dropdown'>Projects </a>
+                <ul id='projects-dropdown' class='dropdown-content'>
+                    <li><a href="/projects">View all</a></li>
+                    <li class="divider"></li>
+                    <li><a href="/projects/create">Create new</a></li>
+                </ul>
+            </li>
+            <li><a class='dropdown-button' href='#' data-activates='events-dropdown'>Events</a>
+                <ul id='events-dropdown' class='dropdown-content'>
+                    <!--View events-->
+                    <li><a href="/events">Query events</a></li>
+                    <li><a href="/events/statistics">Statistics</a></li>
+                    <li class="divider"></li>
+                    <!--Modify events-->
+                    <li><a href="/events/import">Import data</a></li>
+                </ul>
+            </li>
+            <li><a class='dropdown-button' href='#' data-activates='charts-dropdown'>Charts </a>
+                <ul id='charts-dropdown' class='dropdown-content'>
+                    <li><a href="/plots">Build plots</a></li>
+                    <li><a href="/plots/pyplot">Pyplot charts</a></li>
+                </ul>
+            </li>
+            <li><a href="/status">Status</a></li>
+        </ul>
+    </div>
+</nav>
+
+
 <div class="container">
 
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                        data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="/about"><span class="highlight"><i
-                        class="glyphicon glyphicon-envelope"></i> Eventer</span> {{version}}</a>
-            </div>
-            <ul class="nav navbar-nav">
-                <li>
-                    <a href="/about">
-                        About
-                    </a>
-                </li>
-                <li>
-                    <a href="/docs">
-                        Documentation
-                    </a>
-                </li>
-                <li>
-                    <a href="/dashboard">
-                        Dashboard
-                    </a>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Projects
-                        <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="/projects">View all</a></li>
-                        <li class="divider"></li>
-                        <li><a href="/projects/create">Create new</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Events
-                        <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <!--View events-->
-                        <li><a href="/events">Query events</a></li>
-                        <li><a href="/events/statistics">Statistics</a></li>
-                        <li class="divider"></li>
-                        <!--Modify events-->
-                        <li><a href="/events/import">Import data</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Charts
-                        <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="/plots">Build plots</a></li>
-                        <li><a href="/plots/pyplot">Pyplot charts</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="/status">
-                        <div class="title">Status</div>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-
-    <div class="container">
-
-        {% block "content" %}
-        {% end %}
-
-    </div>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="footer-copyright">
-                    Copyright © 2016 - Eventer
-                </div>
-            </div>
-        </div>
-    </div>
+    {% block "content" %}
+    {% end %}
 
 </div>
+
+{#<footer class="page-footer blue-grey lighten-3">#}
+{#    <div class="footer-copyright">#}
+{#        <div class="container">#}
+{#            © 2016 Quartz#}
+{#        </div>#}
+{#    </div>#}
+{#</footer>#}
+
 
 </body>
 </html>

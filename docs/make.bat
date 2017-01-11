@@ -5,7 +5,7 @@ pushd %~dp0
 REM Command file for Sphinx documentation
 
 if "%SPHINXBUILD%" == "" (
-	set SPHINXBUILD=D:\Projects\_eventer\Scripts\sphinx-build.exe
+	set SPHINXBUILD=D:\Projects\gemstones\_quartz\Scripts\sphinx-build.exe
 )
 set SOURCEDIR=source
 set BUILDDIR=build
