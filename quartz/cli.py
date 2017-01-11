@@ -4,9 +4,9 @@ import os.path
 
 import click
 
-from eventer_server.service import EventerService
-from eventer_server.models import set_db_parameters
-from eventer_server import __version__
+from quartz.service import EventerService
+from quartz.models import set_db_parameters
+from quartz import __version__
 
 BANNER = """
     _____                 _
@@ -64,7 +64,7 @@ SAMPLE_CONFIG = """{
 }"""
 
 
-@cli.command("get_sample_config", help="Writes a sample configuration file to STDOUT. Can be used as template"
-                                       " for writing the actual configration file")
-def get_sample_config():
+@cli.command("init", help="Writes a sample configuration file to STDOUT. Can be used as template"
+                          " for writing the actual configration file")
+def init():
     print(SAMPLE_CONFIG)

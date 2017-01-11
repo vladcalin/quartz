@@ -3,10 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to eventer's documentation!
-===================================
+Welcome to quartz's documentation!
+==================================
 
-Eventer is a platform for registering events from various sources
+Quartz is a platform for registering events from various sources
 and visualize the data. It is built using the `pymicroservice <https://github.com/vladcalin/pymicroservice>`_
 library and `MongoDB <https://www.mongodb.com/>`_
 

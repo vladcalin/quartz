@@ -8,18 +8,18 @@ from tornado.web import RedirectHandler
 from pymicroservice.core.microservice import PyMicroService
 from pymicroservice.core.decorators import public_method
 
-from eventer_server.handlers.page_handlers import DashboardHandler, ProjectsHandler, PlotsHandler, EventsHandler, \
+from quartz.handlers.page_handlers import DashboardHandler, ProjectsHandler, PlotsHandler, EventsHandler, \
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
     ViewEventCategory, AboutHandler, DocsHandler, EventsStatisticsHandler, ImportDataHandler, PlotsPyplotHandler
-from eventer_server.lib.query import QueryParser
-from eventer_server.lib.importers.json_importer import JsonImporter
-from eventer_server.lib.importers.xml_importer import XmlImporter
-from eventer_server.models import Project, FieldSpecs, EventCategory, Event, QueryHistory
-from eventer_server.lib.pyplot_charter import PyplotCharter
+from quartz.lib.query import QueryParser
+from quartz.lib.importers.json_importer import JsonImporter
+from quartz.lib.importers.xml_importer import XmlImporter
+from quartz.models import Project, FieldSpecs, EventCategory, Event, QueryHistory
+from quartz.lib.pyplot_charter import PyplotCharter
 
 
 class EventerService(PyMicroService):
-    name = "eventer_server"
+    name = "quartz"
     host = "127.0.0.1"
     port = 8000
 

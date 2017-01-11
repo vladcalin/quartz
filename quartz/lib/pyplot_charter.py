@@ -42,7 +42,7 @@ class PyplotCharter(object):
         cmd = [
             sys.executable,
             "-m",
-            "eventer_server.lib.utilscripts.generate_chart",
+            "quartz.lib.utilscripts.generate_chart",
             "--data", input_file_path,
             "--output", output_file_path,
             "--chart_type", chart_type,

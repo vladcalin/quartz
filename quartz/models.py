@@ -7,7 +7,7 @@ import humanize
 from mongoengine import connect, Document, EmbeddedDocument, ReferenceField, StringField, BooleanField, DateTimeField, \
     EmbeddedDocumentListField, BinaryField, DictField, Q, IntField, FloatField, CASCADE
 
-from eventer_server.lib.util import str_interval_to_datetime
+from quartz.lib.util import str_interval_to_datetime
 
 
 def set_db_parameters(db_url):

@@ -20,10 +20,10 @@ def get_meta_attr_from_string(meta_attr, content):
     return result.group(1)
 
 
-module_content = get_file_content(os.path.join("eventer_server", "__init__.py"))
+module_content = get_file_content(os.path.join("quartz", "__init__.py"))
 
 setup(
-    name="eventer_server",
+    name="quartz",
     version=get_meta_attr_from_string("__version__", module_content),
 
     description="Track events in other applications",
@@ -33,10 +33,11 @@ setup(
 
     packages=find_packages(),
     install_requires=read_dependencies("requirements.txt"),
+    include_package_data=True,
 
     entry_points={
         "console_scripts": [
-            "eventer = eventer_server.cli:cli"
+            "quartz = quartz.cli:cli"
         ]
     }
 )

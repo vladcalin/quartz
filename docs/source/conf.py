@@ -48,7 +48,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'eventer'
+project = 'quartz'
 copyright = '2017, Vlad Calin'
 author = 'Vlad Calin'
 

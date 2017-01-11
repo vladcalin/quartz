@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from eventer_server.lib.query import QueryParser, ParsedQuery
+from quartz.lib.query import QueryParser, ParsedQuery
 
 
 class QueryUnitTests(TestCase):

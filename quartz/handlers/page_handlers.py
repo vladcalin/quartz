@@ -10,8 +10,8 @@ from mongoengine.connection import get_connection
 from tornado.web import RequestHandler, HTTPError
 from tornado.gen import coroutine
 
-from eventer_server import __version__
-from eventer_server.models import Project, EventCategory, FieldSpecs, Event, QueryHistory
+from quartz import __version__
+from quartz.models import Project, EventCategory, FieldSpecs, Event, QueryHistory
 
 ProjectMock = namedtuple("Project", "name description owner category_count event_count last_event_humanized")
 

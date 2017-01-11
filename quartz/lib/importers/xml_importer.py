@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 
 from .base_importer import BaseImporter
-from eventer_server.models import Event
+from quartz.models import Event
 
 
 class XmlImporter(BaseImporter):
