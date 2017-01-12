@@ -1,6 +1,6 @@
 tornado
 mongoengine
-pymicroservice
+gemstone
 humanize
 pypeg2
 pyfiglet
