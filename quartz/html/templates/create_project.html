@@ -1,63 +1,44 @@
 {% extends "template.html" %}
 
-
 {% block "content" %}
+<h4>Create project</h4>
+
 <div class="row">
-    <div class="col-md-12" style="margin-top: 2%">
+    <div class="col s12" style="margin-top: 2%">
         <div class="card">
-            <div class="card-body">
-                <form class="form form-horizontal">
-                    <div class="section">
-                        <div class="section-title"><h3>Create project</h3></div>
-                        <div class="section-body">
-
-                            <!--Project name-->
-                            <div class="form-group">
-                                <label class="col-md-3 control-label">Project name</label>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="" id="name">
-                                </div>
-                            </div>
-
-                            <!--Project description-->
-                            <div class="form-group">
-                                <label class="col-md-3 control-label">Project description</label>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="" id="description">
-                                </div>
-                            </div>
-
-                            <!--Project owner-->
-                            <div class="form-group">
-                                <label class="col-md-3 control-label">Owner</label>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" placeholder="" id="owner">
-                                </div>
-                            </div>
-
+            <div class="card-content">
+                <form>
+                    <div class="section-body">
+                        <!--Project name-->
+                        <div class="input-field">
+                            <input type="text" placeholder="" id="name">
+                            <label for="name">Project name</label>
                         </div>
+
+                        <!--Project description-->
+                        <div class="input-field">
+                            <input type="text" placeholder="" id="description">
+                            <label for="description">Project description</label>
+                        </div>
+
+                        <!--Project owner-->
+                        <div class="input-field">
+                            <input type="text" placeholder="" id="owner">
+                            <label for="owner">Owner</label>
+                        </div>
+
                     </div>
-                    <div class="form-footer">
-                        <div class="form-group">
-                            <div class="col-md-9 col-md-offset-3">
-                                <span class="btn btn-primary" id="submit">Submit
+
+                    <div class="row">
+                                <span class="btn green" id="submit">Submit
                                 </span>
-                                <span onclick="window.history.back();" class="btn btn-default">
+                                <span onclick="window.history.back();" class="btn red">
                                     Cancel
                                 </span>
-                            </div>
-                        </div>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="alert alert-danger  alert-dismissible" role="alert" hidden id="error-msg-box">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
-        </button>
-        <strong>Woops... Something went wrong...</strong> (<span id="error-msg"></span>)
     </div>
 </div>
 
@@ -79,13 +60,11 @@
                 "onSuccess": function (data) {
                     console.log(data);
                     if (data.error !== null) {
-                        $("#error-msg").html("<p>" + JSON.stringify(data.error) + "</p>");
-                        $("#error-msg-box").show();
-                        return
+                        var message = "Error occured (" + data.error.data.class + "): " + data.error.data.info;
+                        Materialize.toast(message, 4000, "red lighten-1");
                     }
                     else {
                         window.location.href = "/projects/view/" + data.result;
-                        return
                     }
                 }
             })
