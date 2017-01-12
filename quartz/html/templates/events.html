@@ -3,65 +3,65 @@
 
 {% block "content" %}
 
-<h3>Events</h3>
+<h5>Events</h5>
 
-<div class="col-lg-12">
-    <div class="card">
-        <div class="card-body">
-
-            <h4>Event query</h4>
-
-            <div class="panel panel-default">
-                <div class="panel-heading" style="padding: 10px;">
-                    Saved queries <a href="#" class="text-success pull-right" onclick="$('#saved-queries').toggle()">Show</a>
-                </div>
-                <div class="panel-body" id="saved-queries" hidden>
-                    <ul id="saved-queries-ul">
-
+<div class="row">
+    <div class="col s12">
+        <ul class="collapsible" data-collapsible="accordion">
+            <li>
+                <div class="collapsible-header blue-grey lighten-5">Last 10 queries</div>
+                <div class="collapsible-body">
+                    <ul class="collection">
+                        {% for query in history %}
+                        <li class="collection-item">
+                            <code>{{ query.query }}</code>
+                            <span class="badge" title="{{ query.result_count }} results">
+                                {{ query.result_count }}
+                            </span>
+                            <span class="badge" title="{{ query.runtime }} seconds duration">
+                                <i class="material-icons">access_time</i>
+                            </span>
+                        <span class="badge" title="{{ query.humanized_timestamp }}"><i
+                                class="material-icons">textsms</i></span>
+                        </li>
+                        {% end %}
                     </ul>
                 </div>
-            </div>
-
-             <div class="panel panel-default">
-                <div class="panel-heading" style="padding: 10px;">
-                    Last 10 queries <a href="#" class="text-success pull-right" onclick="$('#query-history').toggle()">Show</a>
+            </li>
+            <li>
+                <div class="collapsible-header blue-grey lighten-5">Saved queries</div>
+                <div class="collapsible-body">
+                    <ul class="collection" id="saved-queries-ul"></ul>
                 </div>
-                <div class="panel-body" id="query-history" hidden>
-                    <ul>
-                    {% for query in history %}
-                        <li><code>{{query.query}}</code> which yielded {{query.result_count}} results ({{query.runtime}} seconds) - {{query.humanized_timestamp}}</li>
+            </li>
+        </ul>
+
+        <div class="input-field">
+            <label for="query" class="control-label">Query</label>
+
+            <input type="text" class="form-control" id="query" style="font-family: consolas;"
+                    {% if initial_query %}
+                   value="{{ initial_query }}"
                     {% end %}
-                    </ul>
-                </div>
-             </div>
+            >
 
-            <div class="form-group">
-                <label for="query" class="control-label">Query</label>
+            <button class="btn green" id="run-query">Run query</button>
+            <button class="btn" id="save-query">Save query for later visualisation</button>
+        </div>
 
-                <div class="input-group">
-                    <input type="text" class="form-control" id="query" style="font-family: consolas;"
-                           {% if initial_query %}
-                           value="{{initial_query}}"
-                           {% end %}
-                            >
-
-                    <div class="input-group-btn">
-                        <button class="btn btn-success" id="run-query">Run query</button>
-                        <button class="btn btn-default" id="save-query">Save query for later visualisation</button>
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <div id="table-area"></div>
                     </div>
                 </div>
             </div>
-
-            <div class="alert alert-danger" id="query-error" hidden>An error occured: <span id="query-error-msg"></span>
-            </div>
-
-
-            <div id="table-area"></div>
-
         </div>
+
+
     </div>
 </div>
-
 <script>
     var getEventFields = function (data) {
         if (!data.length) {
@@ -107,13 +107,6 @@
 
                     var eventFields = getEventFields(data.result);
 
-//                    var toggleButtons = $("#toggle-column-vis");
-//                    for (var i = 0; i< eventFields.length; i++) {
-//                        toggleButtons.append(
-//                                $("<a class='btn btn-default toggle-col' href='#' data-column='" + i + "'>" + eventFields[i] + "</a>")
-//                        )
-//                    }
-
                     var columns = getColumnDefinitions(eventFields);
 
                     var table = $("#data-table").DataTable({
@@ -124,12 +117,6 @@
                             'copy', 'csv', 'excel', 'pdf'
                         ]
                     });
-
-//                    $("a.toggle-col").on('click', function (event) {
-//                        event.preventDefault();
-//                        var column = table.column($(this).attr("data-column"));
-//                        column.visible(!column.visible());
-//                    })
                 }
             }
         })
@@ -150,7 +137,9 @@
         queriesUl.empty();
         var queries = JSON.parse(window.localStorage.getItem("saved_queries"));
         for (var i in queries) {
-            queriesUl.append("<li><code>" + queries[i] + "</code> <i class='glyphicon glyphicon-remove' onclick='removeSavedQuery(" + i + ");'></i></li>")
+            queriesUl.append("<li class='collection-item'><code>" + queries[i] +
+                    "</code> <span class='badge'><i class='material-icons' onclick='removeSavedQuery("
+                    + i + ");'>close</i></span></li>")
         }
     }
 
@@ -179,7 +168,9 @@
 
     refreshSavedQueries();
 
-    {% if initial_query %} $("#run-query").click(); {% end %}
+    {% if initial_query %}
+    $("#run-query").click();
+    {% end %}
 </script>
 
 {% end %}

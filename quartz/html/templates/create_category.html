@@ -2,26 +2,26 @@
 
 
 {% block "content" %}
+
+<h5>Create category for project {{ project.name }}</h5>
 <div class="row">
-    <div class="col-md-12" style="margin-top: 2%">
+    <div class="col s12">
         <div class="card">
-            <div class="card-body">
+            <div class="card-content">
 
-                <h3>Create category for project {{project.name}}</h3>
-
-                <div class="form-group">
-                    <label for="name" class="control-label">Name</label>
-                    <input type="text" id="name" class="form-control">
+                <div class="input-field">
+                    <input type="text" id="name">
+                    <label for="name">Name</label>
                 </div>
 
-                <div class="form-group">
-                    <label for="description" class="control-label">Description</label>
-                    <input type="text" id="description" class="form-control">
+                <div class="input-field">
+                    <input type="text" id="description">
+                    <label for="description">Description</label>
                 </div>
 
-                <div class="form-group">
-                    <label for="fields" class="control-label">Fields</label>
-                    <textarea id="fields" class="form-control" rows="15" style="font-family: Consolas">
+                <div class="input-field">
+                    <textarea id="fields" rows="15" style="font-family: Consolas, sans-serif"
+                              class="materialize-textarea">
                         [{
                             "name": "example",
                             "description": "example",
@@ -30,6 +30,7 @@
                             "default": null
                         }]
                     </textarea>
+                    <label for="fields">Fields</label>
                 </div>
 
                 <button class="btn btn-default" onclick="window.history.back()">Cancel</button>
@@ -40,20 +41,27 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="alert alert-danger  alert-dismissible" role="alert" hidden id="error-msg-box">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
-        </button>
-        <strong>Woops... Something went wrong...</strong> (<span id="error-msg"></span>)
-    </div>
-</div>
-
 <script>
     $("#create-category-btn").on('click', function () {
         var name = $("#name").val();
         var description = $("#description").val();
-        console.log($("#fields").val());
         var fields = JSON.parse($("#fields").val());
+
+        if (name === "") {
+            $("#name").addClass("invalid");
+            Materialize.toast("Name required", 4000, "red");
+            return;
+        }
+        if (description === "") {
+            $("#description").addClass("invalid");
+            Materialize.toast("Description required", 4000, "red");
+            return;
+        }
+        if (fields == "") {
+            $("#fields").addClass("invalid");
+            Materialize.toast("Fields required", 4000, "red");
+            return;
+        }
 
         var data = {
             "project_id": "{{project.id}}",
@@ -67,10 +75,9 @@
             method: "create_category",
             params: data,
             onSuccess: function (data) {
-                console.log(data);
                 if (data.error) {
-                    $("#error-msg").text(JSON.stringify(data.error));
-                    $("#error-msg-box").show();
+                    var msg = JSON.stringify(data.error);
+                    Materialize.toast(msg, 4000, "red");
                 }
                 else {
                     window.location.href = "/projects/view/{{project.id}}/categories/" + data.result;
