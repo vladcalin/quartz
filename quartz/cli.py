@@ -4,7 +4,7 @@ import os.path
 
 import click
 
-from quartz.service import EventerService
+from quartz.service import QuartzService
 from quartz.models import set_db_parameters
 from quartz import __version__
 
@@ -50,8 +50,8 @@ def start(config):
     with open(config) as f:
         cfg = json.load(f)
     set_db_parameters(get_config_value(cfg, "database_url"))
-    service = EventerService(get_config_value(cfg, "host"), get_config_value(cfg, "port"),
-                             get_config_value(cfg, "registry"))
+    service = QuartzService(get_config_value(cfg, "host"), get_config_value(cfg, "port"),
+                            get_config_value(cfg, "registry"))
     service.start()
 
 

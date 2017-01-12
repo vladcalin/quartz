@@ -4,9 +4,7 @@ import json
 import base64
 
 from tornado.web import RedirectHandler
-
-from pymicroservice.core.microservice import PyMicroService
-from pymicroservice.core.decorators import public_method
+from gemstone import MicroService, public_method
 
 from quartz.handlers.page_handlers import DashboardHandler, ProjectsHandler, PlotsHandler, EventsHandler, \
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
@@ -18,7 +16,7 @@ from quartz.models import Project, FieldSpecs, EventCategory, Event, QueryHistor
 from quartz.lib.pyplot_charter import PyplotCharter
 
 
-class EventerService(PyMicroService):
+class QuartzService(MicroService):
     name = "quartz"
     host = "127.0.0.1"
     port = 8000
@@ -59,7 +57,7 @@ class EventerService(PyMicroService):
     service_registry_ping_interval = 30
 
     def __init__(self, host, port, registry):
-        super(EventerService, self).__init__()
+        super(QuartzService, self).__init__()
         self.host = host
         self.port = port
         if registry:
