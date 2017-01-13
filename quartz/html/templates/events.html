@@ -164,6 +164,8 @@
         currentItems.push(currentQuery);
         window.localStorage.setItem("saved_queries", JSON.stringify(currentItems));
         refreshSavedQueries();
+
+        Materialize.toast("Query saved!", 4000, "green")
     });
 
     refreshSavedQueries();

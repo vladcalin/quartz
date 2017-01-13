@@ -3,68 +3,89 @@ projects.html{% extends "template.html" %}
 
 {% block "content" %}
 
-<h3>Import data</h3>
-
-<div class="form-group">
-    <label for="category" class="control-label">Import data for category</label>
-    <select name="category" id="category" class="form-control">
-        {% for category in categories %}
-        <option value="{{ category.id }}">{{category.name}} (from project {{category.project.name}})</option>
-        {% end %}
-    </select>
-</div>
-
-<div class="form-group">
-    <label for="file_type" class="control-label">Data source type</label>
-    <select name="file_type" id="file_type" class="form-control">
-        <option value="json">JSON</option>
-        <option value="csv">CSV</option>
-        <option value="xml">XML</option>
-    </select>
-</div>
-
-<div class="form-group">
-    <label for="file" class="control-label">Data source file</label>
-    <input type="file" class="form-control" id="file" name="file">
-</div>
+<h5>Import data</h5>
 
 
-<div class="panel panel-warning">
-    <div class="panel-heading">
-        Caution
+<div class="row">
+    <div class="col s12">
+        <form>
+            <div class="input-field col s12">
+                <select name="category" id="category">
+                    {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }} (from project {{ category.project.name }})
+                    </option>
+                    {% end %}
+                </select>
+                <label for="category">Import data for category</label>
+            </div>
+
+            <div class="row">
+                <div class="input-field  col s12">
+                    <select name="file_type" id="file_type">
+                        <option value="json">JSON</option>
+                        <option value="csv">CSV</option>
+                        <option value="xml">XML</option>
+                    </select>
+                    <label for="file_type">Data source type</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field file-field">
+                    <div class="btn">
+                        <span>File</span>
+                        <input type="file" class="form-control" id="file" name="file">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-    <div class="panel-body">
-        <p>When adding data from a file source, the generated events will have
-            their timestamp equal to the moment when they are inserted into
-            the database <br>
-            Therefore, all the inserted events' timestamps will span a few seconds
-            interval, making the generation of time series line charts messy.</p>
-    </div>
 </div>
 
-<button class="btn btn-success" onclick="triggerDataImport();">Add data now</button>
-<button class="btn btn-danger" onclick="window.history.back();">Cancel</button>
 
-<div id="loading-status" class="container">
-    <div class="col-lg-10">
-        Loading file
-        <div class="progress">
-            <div id="progress-load-file" class="progress-bar" style="width: 0;"></div>
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Caution</span>
+                <p>When adding data from a file source, the generated events will have
+                    their timestamp equal to the moment when they are inserted into
+                    the database <br>
+                    Therefore, all the inserted events' timestamps will span a few seconds
+                    interval, making the generation of time series line charts messy.</p>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="error-box"></div>
+
+<button class="btn green" onclick="triggerDataImport();">Add data now</button>
+<button class="btn red" onclick="window.history.back();">Cancel</button>
+
+<div id="loading-status" class="container">
+    <div class="col s12">
+        Loading file
+        <div class="progress">
+            <div id="progress-load-file" class="determinate" style="width: 0;"></div>
+        </div>
+    </div>
+</div>
 
 
 <script>
+    $(document).ready(function () {
+        $('select').material_select();
+    });
+
     function showError(msg) {
-        console.log(msg);
-        bootstrapNotify("danger", msg);
+        Materialize.toast(msg, 4000, "red");
     }
 
     function showSuccess(msg) {
-        bootstrapNotify("success", msg);
+        Materialize.toast(msg, 4000, "green");
     }
 
     function updateProgressBar(progressBarId, loadPercent) {
@@ -78,7 +99,7 @@ projects.html{% extends "template.html" %}
         var dataSourceType = $("#file_type").val();
         var reader = new FileReader();
         var fileObject = document.getElementById("file").files[0];
-        if (fileObject === undefined){
+        if (fileObject === undefined) {
             showError("Please choose a file");
             return;
         }
