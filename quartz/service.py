@@ -56,12 +56,21 @@ class QuartzService(MicroService):
     service_registry_urls = []
     service_registry_ping_interval = 30
 
-    def __init__(self, host, port, registry):
+    def __init__(self, host, port, registry=None, accessible_at=None):
+        """
+        Initializes some parameters of the Quartz service
+
+        :param host: address to bind to
+        :param port: port to bind to
+        :param registry: a list of service registry hosts
+        """
         super(QuartzService, self).__init__()
         self.host = host
         self.port = port
         if registry:
-            self.service_registry_urls = [registry]
+            self.service_registry_urls = registry
+        if accessible_at:
+            self.accessible_at = accessible_at
 
     @public_method
     def create_project(self, name, description, owner):
