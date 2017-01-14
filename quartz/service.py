@@ -8,7 +8,8 @@ from gemstone import MicroService, public_method
 
 from quartz.handlers.page_handlers import DashboardHandler, ProjectsHandler, PlotsHandler, EventsHandler, \
     StatusHandler, CreateProjectHandler, ViewProjectHandler, EditProjectHandler, CreateEventCategoryHandler, \
-    ViewEventCategory, AboutHandler, DocsHandler, EventsStatisticsHandler, ImportDataHandler, PlotsPyplotHandler
+    ViewEventCategory, AboutHandler, DocsHandler, EventsStatisticsHandler, ImportDataHandler, PlotsPyplotHandler, \
+    ReportsRulesHandler, ReportsTemplatesHandler
 from quartz.lib.query import QueryParser
 from quartz.lib.importers.json_importer import JsonImporter
 from quartz.lib.importers.xml_importer import XmlImporter
@@ -30,6 +31,8 @@ class QuartzService(MicroService):
         ("/projects/view/([a-f0-9]+)/create_category", CreateEventCategoryHandler),
         ("/projects/view/([a-f0-9]+)/categories/([a-f0-9]+)", ViewEventCategory),
         ("/dashboard", DashboardHandler),
+        ("/reports/templates", ReportsTemplatesHandler),
+        ("/reports/rules", ReportsRulesHandler),
         ("/projects", ProjectsHandler),
         ("/plots/pyplot", PlotsPyplotHandler),
         ("/plots", PlotsHandler),

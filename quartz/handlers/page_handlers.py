@@ -47,6 +47,18 @@ class AboutHandler(RequestHandler):
         self.render("about.html", version=__version__, require_plots=False, require_datatable=False)
 
 
+class ReportsTemplatesHandler(RequestHandler):
+    @coroutine
+    def get(self):
+        self.render("reports_templates.html", version=__version__, require_plots=False, require_datatable=False)
+
+
+class ReportsRulesHandler(RequestHandler):
+    @coroutine
+    def get(self):
+        self.render("reports_rules.html", version=__version__, require_plots=False, require_datatable=False)
+
+
 class DocsHandler(RequestHandler):
     @coroutine
     def get(self):
