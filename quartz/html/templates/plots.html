@@ -3,46 +3,64 @@ projects.html{% extends "template.html" %}
 
 {% block "content" %}
 
-<h3>Plots</h3>
+<h5>Make plots</h5>
 
 <p>Check the documentation of plots to see what parameters are important</p>
 
 <h5>Plot options</h5>
+
+
 <div class="row">
-    <div class="col-lg-6">
+    <div class="col s6">
 
-        <div class="radio" onclick="displayInfoPanel('line');">
-            <label>
-                <input type="radio" name="plot-type" checked value="line"> Line graph (values are required to be
-                numbers)
+        <p onclick="displayInfoPanel('line');">
+            <input type="radio" name="plot-type" checked value="line" id="plot-type-line">
+            <label for="plot-type-line">
+                Line graph (values are required to be numbers)
             </label>
-        </div>
+        </p>
 
-        <div class="radio" onclick="displayInfoPanel('ts_line');">
-            <label>
-                <input type="radio" name="plot-type" value="ts_line"> Timeseries line graph (values are required to be
-                numbers)
+        <p onclick="displayInfoPanel('ts_line');">
+            <input type="radio" name="plot-type" value="ts_line" id="plot-type-ts_line">
+            <label for="plot-type-ts_line">
+                Timeseries line graph (values are required to be numbers)
             </label>
-        </div>
+        </p>
 
-        <div class="radio" onclick="displayInfoPanel('pie');">
-            <label>
-                <input type="radio" name="plot-type" value="pie"> Pie chart (no value restrictions)
+        <p onclick="displayInfoPanel('pie');">
+            <input type="radio" name="plot-type" value="pie" id="plot-type-pie">
+            <label for="plot-type-pie">
+                Pie chart (no value restrictions)
             </label>
-        </div>
+        </p>
 
     </div>
-    <div class="col-lg-6">
-        <div id="info_line" class="info-panel">
-            The <b>line</b> plot displays the desired value fluctuation in a equally distributed manner.
-        </div>
-        <div id="info_ts_line" class="info-panel">
-            The <b>timeseries line</b> plot displays the desired value fluctuation where the distance on <code>x</code>
-            axis is directly proportional to the time distance between the two events occured.
-        </div>
-        <div id="info_pie" class="info-panel">
-            The <b>pie</b> chart offers a graphical interpretation of the percent of values with equal values for the
-            given field, relative to the total queried events.
+    <div class="col s6">
+        <div class="card">
+            <div class="card-content">
+
+                <div id="info_line" class="info-panel">
+                    The <b>line</b> plot displays the desired value fluctuation in a equally distributed manner.
+                </div>
+
+                <div id="info_ts_line" class="info-panel">
+                    The <b>timeseries line</b> plot displays the desired value fluctuation where the distance on
+                    <code>x</code>
+                    axis is directly proportional to the time distance between the two events occured.
+                </div>
+
+                <div id="info_pie" class="info-panel">
+                    The <b>pie</b> chart offers a graphical interpretation of the percent of values with equal values
+                    for
+                    the
+                    given field, relative to the total queried events.
+
+                    <div class="card-panel red darken-2 white-text">
+                        <i class="material-icons">warning</i>
+                        This plot type only generates plot for the first query.
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -58,18 +76,22 @@ projects.html{% extends "template.html" %}
 </script>
 
 
-<hr>
-
 <div class="row">
-    <h4>Saved queries</h4>
-    <ul id="saved-queries">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Saved queries</span>
+                <ul id="saved-queries" class="collection">
 
-    </ul>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row">
     <h4>Current queries</h4>
-    <ul id="current-queries">
+    <ul id="current-queries" class="collection">
     </ul>
 </div>
 
@@ -100,9 +122,10 @@ projects.html{% extends "template.html" %}
             queries = JSON.parse(queriesStr);
         }
         for (var i in queries) {
-            $("#saved-queries").append($("<li data-query-id=" + i + "><code class='query'>" + queries[i] +
-                    "</code> by field <input type='text' class='field'>" +
-                    "<a onclick='addQuery(" + i + ")'><span class='btn btn-primary btn-xs'>Add</span></a></li>"))
+            $("#saved-queries").append($("<li class='collection-item' data-query-id=" + i + ">" +
+                    "<code class='query blue-text text-darken-2'>"
+                    + queries[i] + "</code> by field <input type='text' class='field'>" +
+                    "<a onclick='addQuery(" + i + ")'><span class='btn'>Add</span></a></li>"))
         }
     }
     toggleSavedQueries();
@@ -110,8 +133,7 @@ projects.html{% extends "template.html" %}
     $("#error-box").hide();
 
     function showError(m) {
-        $("#error-msg").text(m);
-        $("#error-box").show();
+        Materialize.toast(m, 4000, "red");
     }
 
     function addQuery(index) {
@@ -123,9 +145,10 @@ projects.html{% extends "template.html" %}
             showError("Field name must not be empty");
             return;
         }
-        $("#current-queries").append($('<li data-query="' + encodeURIComponent(query) + '" data-field="' + field +
-                '" data-id="' + globalCurrentQueries + '"><code>' + query + '</code> by field <code>' + field + '</code> <a \
-                onclick="removeCurrentQuery(' + globalCurrentQueries + ')" title="Remove"><i class="glyphicon glyphicon-remove"></i></a></li>'));
+        $("#current-queries").append($('<li class="collection-item" data-query="' + encodeURIComponent(query) +
+                '" data-field="' + field + '" data-id="' + globalCurrentQueries + '"><code>' + query +
+                '</code> by field <code>' + field + '</code> <a class="secondary-content" onclick="removeCurrentQuery('
+                + globalCurrentQueries + ')" title="Remove">X</a></li>'));
         globalCurrentQueries++;
         fieldElement.val("");
     }

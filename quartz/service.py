@@ -165,6 +165,7 @@ class QuartzService(MicroService):
     def build_pyplot_chart(self, query, title, by_field, chart_type):
         result = {}
         _time = time.time()
+        print(query, title, by_field, chart_type)
         events = self.query_events(query, save_history=False)
 
         result["query_duration"] = time.time() - _time
@@ -175,7 +176,6 @@ class QuartzService(MicroService):
 
         result["chart_generation_duration"] = time.time() - _time
         result["plot_image"] = plot_data
-
         return result
 
     # Implement your token validation logic
