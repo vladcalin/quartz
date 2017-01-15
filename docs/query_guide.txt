@@ -4,13 +4,22 @@ Filtering events:
 
 Query syntax:
 
-query :- "select \"" + queryname + "\" where " + clauses
+query :- "select \"" + queryname + "\" where " + clauses + compact_data_clause?
 queryname :- [a-zA-Z_\-0-9]+
 clauses :- (single_clause) OR (single_clause + " and " + clauses)
 
+compact_data_clause :- "compact by " + compact_method + "(" + regular_field_name + "," + compact_interval + ")"
+compact_method :- "sum" OR "avg" OR "max" OR "min"
+compact_interval :- [1-9][0-9]*
 single_clause :- (metadata_field_name OR regular_field_name) + " " + operator + " " + value
 
 metadata_field_name :- "__timestamp__" OR "__source__"
 regular_field_name :- "values__" + [a-zA-Z0-9_\-]+
 
 operator :- "=" OR ">=" OR ">" OR "<" OR "<="
+
+
+Example query:
+
+select "projectname.category" where __timestamp__ >= 24h and values__count >= 30 and values__count <=50
+    compact by sum(values__count, 10)
