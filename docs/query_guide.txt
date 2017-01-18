@@ -4,22 +4,40 @@ Filtering events:
 
 Query syntax:
 
-query :- "select \"" + queryname + "\" where " + clauses + compact_data_clause?
-queryname :- [a-zA-Z_\-0-9]+
-clauses :- (single_clause) OR (single_clause + " and " + clauses)
+query :- action + collection + "where" + filter_clauses + compact_clauses
 
-compact_data_clause :- "compact by " + compact_method + "(" + regular_field_name + "," + compact_interval + ")"
-compact_method :- "sum" OR "avg" OR "max" OR "min"
-compact_interval :- [1-9][0-9]*
-single_clause :- (metadata_field_name OR regular_field_name) + " " + operator + " " + value
+action :- "select"
 
-metadata_field_name :- "__timestamp__" OR "__source__"
-regular_field_name :- "values__" + [a-zA-Z0-9_\-]+
+collection :- ("\"" + [a-zA-Z0-9_\.]+ + "\"") OR ("\'" + [a-zA-Z0-9_\.]+ + "\'")
 
-operator :- "=" OR ">=" OR ">" OR "<" OR "<="
+filter_clauses :- single_filter_clause OR (single_filter_clause + "and" + filter_clauses)
+single_filter_clause :- basic_filter OR predicate_filter
+basic_filter :- identifier + operator + value
+predicate_filter :- predicate_name + "(" + parameters + ")"
+
+compact_clauses :- "compact by" + single_compact_clause
+single_compact_clause :- compact_rule + "(" + identifier + "," + value + ")"
+
+parameters :- single_param OR (single_param + "," + parameters)
+single_parameter :- identifier OR value
+
+identifier :- special_attr OR regular_attr
+value :- string_value OR integer_value OR boolean_value
+
+operator :- "=" OR "<" OR ">" OR "<=" OR ">="
+special_attr :- "__timestamp__" OR "__source__"
+regular_attr :- [a-zA-Z9-0_]+
+string_value :- ("'" + .* + "'") OR ("\"" + .* + "\"")
+integer_value :- \d+
+boolean_value :- "True" OR "TRUE" OR "true" OR "False" OR "FALSE" OR "false"
 
 
 Example query:
 
-select "projectname.category" where __timestamp__ >= 24h and values__count >= 30 and values__count <=50
-    compact by sum(values__count, 10)
+select "projectname.category" 
+    where __timestamp__ >= 24h and count >= 30 and count <=50
+    compact by sum(count, 10)
+    
+select "projectname.category" 
+    where size >= 30 and regex(name, "a-z") 
+    compact by avg(size, 5)
