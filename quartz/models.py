@@ -178,6 +178,29 @@ class QueryHistory(Document):
         return humanize.naturaltime(self.timestamp)
 
 
+class Template(Document):
+    """
+    Default context:
+
+    datetime_now - datetime.datetime.now()
+    query("...") - yields events based on the query
+    plot("line", query("..."), "field") - draws a plot of type "line" with the queries yielded by the query using the
+        "field" field.
+
+    """
+    name = StringField()
+    description = StringField()
+    body = BinaryField()
+
+
+class ReportSchedule(Document):
+    name = StringField()
+    description = StringField()
+    smtp_parameters = DictField()
+    template = ReferenceField(Template, reverse_delete_rule=CASCADE)
+    crontab = StringField()
+
+
 if __name__ == '__main__':
     Project(name="test.6", description="Just a test project", owner="rpg").save()
     Project(name="test.7", description="Just a test project", owner="rpg").save()
