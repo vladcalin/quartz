@@ -20,7 +20,7 @@ BANNER = """
 """.format(version=__version__)
 
 DEFAULTS = {
-    "database_url": "mongo://localhost:27017/quartz",
+    "cassandra_cluster": ["127.0.0.1"],
     "host": "0.0.0.0",
     "port": 8000,
     "registry": [],
@@ -50,7 +50,7 @@ def start(config):
     print_banner(config)
     with open(config) as f:
         cfg = json.load(f)
-    set_db_parameters(get_config_value(cfg, "database_url"))
+    set_db_parameters(get_config_value(cfg, "cassandra_cluster"))
     service = QuartzService(get_config_value(cfg, "host"), get_config_value(cfg, "port"),
                             get_config_value(cfg, "registry"), get_config_value(cfg, "accessible_at"))
     service.start()

@@ -1,5 +1,5 @@
 tornado
-mongoengine
+cassandra-driver
 gemstone
 humanize
 pyparsing
