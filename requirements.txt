@@ -2,6 +2,6 @@ tornado
 cassandra-driver
 gemstone
 humanize
-pyparsing
+pypeg2
 pyfiglet
 matplotlib
