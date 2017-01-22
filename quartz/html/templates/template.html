@@ -2,82 +2,42 @@
 <html>
 <head>
     <title>Quartz {{ version }}</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" type="text/css" href="/static/css/materialize.min.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/animate.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/animate.css">
 
     <script src="/static/js/jquery-3.1.1.min.js"></script>
-    <script type="text/javascript" src="/static/js/materialize.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap-notify.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
     <script src="/static/js/pymicroservice.js"></script>
 
-
-    {% if require_plots %}
-
-
-    <link rel="stylesheet" href="/static/css/c3.min.css">
-    <script src="/static/js/d3.v3.min.js"></script>
-    <script src="/static/js/c3.min.js"></script>
-
-
-    {% end %}
-
-    {% if require_datatable %}
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
-
-    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js"></script>
-    <script src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js"></script>
-
-    {% end %}
 
 </head>
 <body>
 
-<nav class="blue-grey darken-2">
+<nav class="navbar navbar-inverse">
     <div class="container">
-        <a href="#" class="brand-logo">quartz - {{ version }}</a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="/about">About</a></li>
-            <li><a href="/docs">Documentation</a></li>
-            <li><a class='dropdown-button' href='#' data-activates='projects-dropdown'>Projects </a>
-                <ul id='projects-dropdown' class='dropdown-content'>
-                    <li><a href="/projects">View all</a></li>
-                    <li class="divider"></li>
-                    <li><a href="/projects/create">Create new</a></li>
-                </ul>
-            </li>
-            <li><a class='dropdown-button' href='#' data-activates='events-dropdown'>Events</a>
-                <ul id='events-dropdown' class='dropdown-content'>
-                    <!--View events-->
-                    <li><a href="/events">Query events</a></li>
-                    <li><a href="/events/statistics">Statistics</a></li>
-                    <li class="divider"></li>
-                    <!--Modify events-->
-                    <li><a href="/events/import">Import data</a></li>
-                </ul>
-            </li>
-            <li><a class='dropdown-button' href='#' data-activates='charts-dropdown'>Charts </a>
-                <ul id='charts-dropdown' class='dropdown-content'>
-                    <li><a href="/plots">Build plots</a></li>
-                    <li><a href="/plots/pyplot">Pyplot charts</a></li>
-                </ul>
-            </li>
-            <li><a class='dropdown-button' href='#' data-activates='reports-dropdown'>Reports </a>
-                <ul id='reports-dropdown' class='dropdown-content'>
-                    <li><a href="/reports/templates">Templates</a></li>
-                    <li><a href="/reports/rules">Generation rules</a></li>
-                </ul>
-            </li>
-            <li><a href="/status">Status</a></li>
-        </ul>
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Quartz {{ version }}</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <li><a href="/docs">Documentation</a></li>
+                <li><a href="/register">Register</a></li>
+                <li><a href="/login">Login</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
     </div>
 </nav>
 
@@ -88,14 +48,6 @@
     {% end %}
 
 </div>
-
-{#<footer class="page-footer blue-grey lighten-3">#}
-{#    <div class="footer-copyright">#}
-{#        <div class="container">#}
-{#            © 2016 Quartz#}
-{#        </div>#}
-{#    </div>#}
-{#</footer>#}
 
 
 </body>
