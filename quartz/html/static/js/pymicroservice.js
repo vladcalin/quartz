@@ -8,6 +8,7 @@ var pymicroserviceMethodCall = function (opts) {
     var method = opts.method;
     var params = opts.params;
     var onSuccess = opts.onSuccess;
+    var onError = opts.onError;
 
     $.ajax({
         url: url,
@@ -18,9 +19,16 @@ var pymicroserviceMethodCall = function (opts) {
             "jsonrpc": "2.0",
             "method": method,
             "params": params,
-            "id": counter
+            "id": Math.random().toString(36).substring(7)
         }),
-        success: onSuccess
+        success: function (data) {
+            if (data.error == null) {
+                onSuccess(data.result);
+            }
+            else {
+                onError(data.error);
+            }
+        }
     });
     counter++;
 
@@ -32,6 +40,7 @@ var pymicroserviceBatchCall = function (opts) {
         url = "/api";
     }
     var onSuccess = opts.onSuccess;
+    var onError = opts.onError;
 
     var body = [];
     for (var i = 0; i < opts.calls.length; i++) {
@@ -39,7 +48,7 @@ var pymicroserviceBatchCall = function (opts) {
             "jsonrpc": "2.0",
             "method": opts.calls[i].method,
             "params": opts.calls[i].params,
-            "id": i + 1
+            "id": Math.random().toString(36).substring(7)
         })
     }
     $.ajax({
@@ -48,7 +57,14 @@ var pymicroserviceBatchCall = function (opts) {
         contentType: "application/json",
         dataType: "json",
         data: JSON.stringify(body),
-        success: onSuccess
+        success: function (data) {
+            if (data.error == null) {
+                onSuccess(data.result);
+            }
+            else {
+                onError(data.error);
+            }
+        }
     });
 };
 

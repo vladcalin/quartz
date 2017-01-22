@@ -54,6 +54,10 @@ class QuartzService(MicroService):
         if accessible_at:
             self.accessible_at = accessible_at
 
+    @public_method
+    def create_user(self, username, email, password):
+        pass
+
     # Implement your token validation logic
     def api_token_is_valid(self, api_token):
         return True

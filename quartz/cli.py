@@ -5,8 +5,8 @@ import os.path
 import click
 
 from quartz.service import QuartzService
-from quartz.models import set_db_parameters
 from quartz import __version__
+from quartz.db.manager import CassandraClusterManager
 
 BANNER = """
                                  _
@@ -50,9 +50,16 @@ def start(config):
     print_banner(config)
     with open(config) as f:
         cfg = json.load(f)
-    set_db_parameters(get_config_value(cfg, "cassandra_cluster"))
-    service = QuartzService(get_config_value(cfg, "host"), get_config_value(cfg, "port"),
-                            get_config_value(cfg, "registry"), get_config_value(cfg, "accessible_at"))
+
+    CassandraClusterManager.connect_to_cluster(
+        *get_config_value(cfg, "cassandra_cluster")
+    )
+
+    service = QuartzService(
+        host=get_config_value(cfg, "host"),
+        port=get_config_value(cfg, "port"),
+        registry=get_config_value(cfg, "registry"),
+        accessible_at=get_config_value(cfg, "accessible_at"))
     service.start()
 
 
