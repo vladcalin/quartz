@@ -8,6 +8,7 @@ from gemstone import MicroService, public_method
 
 from quartz.handlers.index import IndexRequestHandler
 from quartz.handlers.auth import RegisterRequestHandler
+from quartz.db.users import Users
 
 
 class QuartzService(MicroService):
@@ -56,7 +57,9 @@ class QuartzService(MicroService):
 
     @public_method
     def create_user(self, username, email, password):
-        pass
+        user_instance = Users.create_user(username, password, email)
+        print(user_instance)
+        return user_instance.id
 
     # Implement your token validation logic
     def api_token_is_valid(self, api_token):

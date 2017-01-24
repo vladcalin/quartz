@@ -22,6 +22,9 @@ class Users(object):
         "CREATE INDEX IF NOT EXISTS index_users_username ON quartz.users (useraname)",
     ]
 
+    GET_USER_BY_NAME = """SELECT * FROM quartz.users WHERE username = %s"""
+    GET_USER_BY_EMAIL = """SELECT * FROM quartz.users WHERE email = %s"""
+
     @classmethod
     def create_user_table(cls):
         cls.session.execute(cls.CREATE_TABLE)
@@ -29,3 +32,12 @@ class Users(object):
         # create the indexes
         for index_stmt in cls.INDEXES:
             cls.session.execute(index_stmt)
+
+    @classmethod
+    def create_user(cls, username, password, email):
+        session = CassandraClusterManager.get_session()
+        try:
+            user = list(session.execute(cls.GET_USER_BY_NAME, (username,)))
+        except Exception as e:
+            print(e)
+        return user

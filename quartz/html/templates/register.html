@@ -1,86 +1,80 @@
 {% extends "template.html" %}
 
 
-{% block "content" %}
+{% block content %}
 
-<div class="container col-lg-8 col-lg-offset-2">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Create a new account</h3>
+<h3>Create a new account</h3>
+
+<div class="col-lg-8">
+
+    <form class="form-horizontal" data-toggle="validator">
+
+        <!-- Username -->
+        <div class="form-group">
+            <label for="username" class="control-label col-lg-3">Username</label>
+            <div class="col-lg-9">
+                <input type="text" class="form-control" name="username" id="username" required>
+            </div>
+            <div class="help-block with-errors col-lg-offset-3"></div>
         </div>
-        <div class="panel-body">
 
-            <form class="form-horizontal" data-toggle="validator">
-
-                <!-- Username -->
-                <div class="form-group">
-                    <label for="username" class="control-label col-lg-3">Username</label>
-                    <div class="col-lg-9">
-                        <input type="text" class="form-control" name="username" id="username" required>
-                    </div>
-                    <div class="help-block with-errors col-lg-offset-3"></div>
-                </div>
-
-                <!-- Email -->
-                <div class="form-group">
-                    <label for="email" class="control-label col-lg-3">Email</label>
-                    <div class="col-lg-9">
-                        <input type="email" class="form-control" name="email" id="email" required>
-                    </div>
-                    <div class="help-block with-errors col-lg-offset-3"></div>
-                </div>
-
-                <!-- Confirm email -->
-                <div class="form-group">
-                    <label for="email_confirm" class="control-label col-lg-3">Confirm email</label>
-                    <div class="col-lg-9">
-                        <input type="email" class="form-control" name="email_confirm" id="email_confirm" required
-                               data-match="#email">
-                    </div>
-                    <div class="help-block with-errors col-lg-offset-3"></div>
-                </div>
-
-                <!-- Password -->
-                <div class="form-group">
-                    <label for="password" class="control-label col-lg-3">Password</label>
-                    <div class="col-lg-9">
-                        <input type="password" class="form-control" name="password" id="password" required>
-                    </div>
-                    <div class="help-block with-errors col-lg-offset-3"></div>
-                </div>
-
-                <!-- Confirm password -->
-                <div class="form-group">
-                    <label for="password_confirm" class="control-label col-lg-3">Confirm password</label>
-                    <div class="col-lg-9">
-                        <input type="password" class="form-control" name="password_confirm" id="password_confirm"
-                               required data-match="#password">
-                    </div>
-                    <div class="help-block with-errors col-lg-offset-3"></div>
-                </div>
-
-                <!-- Eula -->
-                <div class="form-group">
-                    <div class="col-sm-offset-3 col-sm-10">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" id="eula_check" required>
-                                I accept the <a href="#">Terms and conditions</a>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="help-block with-errors col-lg-offset-3"></div>
-                </div>
-
-
-                <div class="col-lg-offset-3">
-                    <button class="btn btn-success" id="submit_btn">Create new account</button>
-                </div>
-
-            </form>
-
+        <!-- Email -->
+        <div class="form-group">
+            <label for="email" class="control-label col-lg-3">Email</label>
+            <div class="col-lg-9">
+                <input type="email" class="form-control" name="email" id="email" required>
+            </div>
+            <div class="help-block with-errors col-lg-offset-3"></div>
         </div>
-    </div>
+
+        <!-- Confirm email -->
+        <div class="form-group">
+            <label for="email_confirm" class="control-label col-lg-3">Confirm email</label>
+            <div class="col-lg-9">
+                <input type="email" class="form-control" name="email_confirm" id="email_confirm" required
+                       data-match="#email">
+            </div>
+            <div class="help-block with-errors col-lg-offset-3"></div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+            <label for="password" class="control-label col-lg-3">Password</label>
+            <div class="col-lg-9">
+                <input type="password" class="form-control" name="password" id="password" required>
+            </div>
+            <div class="help-block with-errors col-lg-offset-3"></div>
+        </div>
+
+        <!-- Confirm password -->
+        <div class="form-group">
+            <label for="password_confirm" class="control-label col-lg-3">Confirm password</label>
+            <div class="col-lg-9">
+                <input type="password" class="form-control" name="password_confirm" id="password_confirm"
+                       required data-match="#password">
+            </div>
+            <div class="help-block with-errors col-lg-offset-3"></div>
+        </div>
+
+        <!-- Eula -->
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-10">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="eula_check" required>
+                        I accept the <a href="#">Terms and conditions</a>
+                    </label>
+                </div>
+            </div>
+            <div class="help-block with-errors col-lg-offset-3"></div>
+        </div>
+
+
+        <div class="col-lg-offset-3">
+            <button class="btn btn-success" id="submit_btn">Create new account</button>
+        </div>
+
+    </form>
 </div>
 
 <script>
@@ -94,7 +88,6 @@
         var username = $("#username").val();
         var email = $("#email").val();
         var password = $("#password").val();
-
 
 
     }
