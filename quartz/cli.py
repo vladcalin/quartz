@@ -54,6 +54,7 @@ def start(config):
     CassandraClusterManager.connect_to_cluster(
         *get_config_value(cfg, "cassandra_cluster")
     )
+    CassandraClusterManager.ensure_namespace()
 
     service = QuartzService(
         host=get_config_value(cfg, "host"),

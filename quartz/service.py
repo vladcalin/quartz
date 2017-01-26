@@ -9,6 +9,7 @@ from gemstone import MicroService, public_method
 from quartz.handlers.index import IndexRequestHandler
 from quartz.handlers.auth import RegisterRequestHandler
 from quartz.db.users import Users
+from quartz.db.manager import CassandraClusterManager
 
 
 class QuartzService(MicroService):
@@ -54,6 +55,12 @@ class QuartzService(MicroService):
             self.service_registry_urls = registry
         if accessible_at:
             self.accessible_at = accessible_at
+
+    def on_service_start(self):
+        CassandraClusterManager.ensure_namespace()
+
+        # initialize objects context
+        Users.initialize_table_context()
 
     @public_method
     def create_user(self, username, email, password):
