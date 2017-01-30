@@ -75,29 +75,46 @@ def cli():
 
 
 def start_single_service(service_module, host, port, accessible_at, service_registry_list):
-    cmd = [sys.executable, "-m", service_module, "start", "--host", host, "--port", port, "--accessible_at", accessible_at,
+    cmd = [sys.executable, "-m", service_module, "start", "--host", host, "--port", port, "--accessible_at",
+           accessible_at,
            "--service_registry"]
     cmd.extend(service_registry_list)
     subprocess.Popen(cmd)
 
 
-def start_services(config):
-    service_registries = config.get("services", "service_registry").split(",")
-    start_single_service("quartz.service.webui.service",
-                         host=config.get("quartz.webui", "host"),
-                         port=config.get("quartz.webui", "port"),
-                         accessible_at=config.get("quartz.webui", "accessible_at"),
-                         service_registry_list=service_registries)
-    print("Service quartz.webui started")
+def start_service(name, config):
+    start_single_service("quartz.service.{}.service".format(name),
+                         host=config.get("quartz.{}".format(name), "host"),
+                         port=config.get("quartz.{}".format(name), "port"),
+                         accessible_at=config.get("quartz.{}".format(name), "accessible_at"),
+                         service_registry_list=config.get("services", "service_registry").split(","))
 
 
 @cli.command("start", help="The INI configuration file with the desired parameters")
+@click.option("--all", help="Start one instance of each services", is_flag=True)
+@click.option("--auth", help="Start an instance of quartz.auth", is_flag=True)
+@click.option("--coremgmt", help="Start an instance of quartz.coremgmt", is_flag=True)
+@click.option("--plot", help="Start an instance of quartz.plot", is_flag=True)
+@click.option("--notifier", help="Start an instance of quartz.notifier", is_flag=True)
+@click.option("--webui", help="Start an instance of quartz.webui", is_flag=True)
 @click.argument("config")
-def start(config):
+def start(all, auth, coremgmt, plot, notifier, webui, config):
     print_banner(config)
-    config_parsed = configparser.ConfigParser()
-    config_parsed.read(config)
-    start_services(config_parsed)
+    config = configparser.ConfigParser()
+    config.read(config)
+    if all:
+        auth = coremgmt = plot = notifier = webui = True
+
+    if webui:
+        start_service("webui", config)
+    if coremgmt:
+        start_service("coremgmt", config)
+    if auth:
+        start_service("auth", config)
+    if notifier:
+        start_service("notifier", config)
+    if plot:
+        start_service("plot", config)
 
 
 SAMPLE_CONFIG = DEFAULT_INI
