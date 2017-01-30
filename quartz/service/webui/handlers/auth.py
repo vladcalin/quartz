@@ -1,6 +1,6 @@
 from tornado.gen import coroutine
 
-from quartz.handlers.base import QuartzBaseRequestHandler
+from quartz.service.webui.handlers import QuartzBaseRequestHandler
 
 
 class RegisterRequestHandler(QuartzBaseRequestHandler):

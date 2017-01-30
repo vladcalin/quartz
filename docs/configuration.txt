@@ -1,0 +1,35 @@
+
+
+
+configurator.define("core.logging.level", default="info")
+configurator.define("core.logging.format", default="...")
+configurator.define("server.host", default="127.0.0.1")
+configurator.define("server.port", default=80)
+
+configurator.load_from_commandline()
+configurator.load_from_file("myfile.ini")
+configurator.load_from_path()
+
+
+
+From commandline
+----------------
+
+-o core.logging.level=info -o core.logging.format="..." -o server.port=80 -o server.host=0.0.0.0
+
+
+From file
+---------
+
+[core]
+logging.level = info
+logging.format = ...
+
+[server]
+host = 0.0.0.0
+port = 80
+
+
+From path
+---------
+

@@ -1,15 +1,15 @@
 import json
 import sys
 import os.path
+import configparser
+import subprocess
 
 import click
 
-from quartz.service import QuartzService
 from quartz import __version__
 from quartz.db.manager import CassandraClusterManager
 
 BANNER = """
-                                 _
           __ _ _   _  __ _ _ __| |_ ____
          / _` | | | |/ _` | '__| __|_  /
         | (_| | |_| | (_| | |  | |_ / /
@@ -19,17 +19,47 @@ BANNER = """
     Current version: {version}
 """.format(version=__version__)
 
-DEFAULTS = {
-    "cassandra_cluster": ["127.0.0.1"],
-    "host": "0.0.0.0",
-    "port": 8000,
-    "registry": [],
-    "accessible_at": ["127.0.0.1", 8000]
-}
+DEFAULT_INI = """
+[cassandra]
+host = 127.0.0.1:9042,127.0.0.2:9042
 
+[services]
 
-def get_config_value(config, key):
-    return config.get(key, DEFAULTS[key])
+service_registry = http://127.0.0.1:8000/api
+
+[quartz.webui]
+host = 0.0.0.0
+port = 80
+root = /quartz
+accessible_at = http://localhost/quartz/api
+
+[quartz.coremgmt]
+host = 0.0.0.0
+port = 8000
+root = /quartz/coremgmt/api
+accessible_at = http://localhost/quartz/coremgmt/api
+
+[quartz.plot]
+host = 0.0.0.0
+port = 8001
+root = /quartz/plot/api
+accessible_at = http://localhost/quartz/plot/api
+
+[quartz.notifier]
+host = 0.0.0.0
+port = 8002
+root = /quartz/notifier/api
+accessible_at = http://localhost/quartz/notifier/api
+
+inboxes = senderinbox
+
+[quartz.auth]
+host = 0.0.0.0
+port = 80003
+root = /quartz/auth/api
+accessible_at = http://localhost/quartz/auth/api
+
+"""
 
 
 def print_banner(config_file):
@@ -44,27 +74,33 @@ def cli():
     pass
 
 
-@cli.command("start", help="The JSON configuration file with the parameters")
+def start_single_service(service_module, host, port, accessible_at, service_registry_list):
+    cmd = [sys.executable, "-m", service_module, "start", "--host", host, "--port", port, "--accessible_at", accessible_at,
+           "--service_registry"]
+    cmd.extend(service_registry_list)
+    subprocess.Popen(cmd)
+
+
+def start_services(config):
+    service_registries = config.get("services", "service_registry").split(",")
+    start_single_service("quartz.service.webui.service",
+                         host=config.get("quartz.webui", "host"),
+                         port=config.get("quartz.webui", "port"),
+                         accessible_at=config.get("quartz.webui", "accessible_at"),
+                         service_registry_list=service_registries)
+    print("Service quartz.webui started")
+
+
+@cli.command("start", help="The INI configuration file with the desired parameters")
 @click.argument("config")
 def start(config):
     print_banner(config)
-    with open(config) as f:
-        cfg = json.load(f)
-
-    CassandraClusterManager.connect_to_cluster(
-        *get_config_value(cfg, "cassandra_cluster")
-    )
-    CassandraClusterManager.ensure_namespace()
-
-    service = QuartzService(
-        host=get_config_value(cfg, "host"),
-        port=get_config_value(cfg, "port"),
-        registry=get_config_value(cfg, "registry"),
-        accessible_at=get_config_value(cfg, "accessible_at"))
-    service.start()
+    config_parsed = configparser.ConfigParser()
+    config_parsed.read(config)
+    start_services(config_parsed)
 
 
-SAMPLE_CONFIG = json.dumps(DEFAULTS, indent=4, sort_keys=True)
+SAMPLE_CONFIG = DEFAULT_INI
 
 
 @cli.command("init", help="Writes a sample configuration file to STDOUT. Can be used as template"
