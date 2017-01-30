@@ -1,13 +1,12 @@
 import json
 import sys
 import os.path
-import configparser
 import subprocess
 
 import click
 
 from quartz import __version__
-from quartz.db.manager import CassandraClusterManager
+from quartz.daemon import MasterDaemon
 
 BANNER = """
           __ _ _   _  __ _ _ __| |_ ____
@@ -19,47 +18,69 @@ BANNER = """
     Current version: {version}
 """.format(version=__version__)
 
-DEFAULT_INI = """
-[cassandra]
-host = 127.0.0.1:9042,127.0.0.2:9042
-
-[services]
-
-service_registry = http://127.0.0.1:8000/api
-
-[quartz.webui]
-host = 0.0.0.0
-port = 80
-root = /quartz
-accessible_at = http://localhost/quartz/api
-
-[quartz.coremgmt]
-host = 0.0.0.0
-port = 8000
-root = /quartz/coremgmt/api
-accessible_at = http://localhost/quartz/coremgmt/api
-
-[quartz.plot]
-host = 0.0.0.0
-port = 8001
-root = /quartz/plot/api
-accessible_at = http://localhost/quartz/plot/api
-
-[quartz.notifier]
-host = 0.0.0.0
-port = 8002
-root = /quartz/notifier/api
-accessible_at = http://localhost/quartz/notifier/api
-
-inboxes = senderinbox
-
-[quartz.auth]
-host = 0.0.0.0
-port = 80003
-root = /quartz/auth/api
-accessible_at = http://localhost/quartz/auth/api
-
-"""
+DEFAULTS = {
+    "context": {
+        "real_ip": "127.0.0.1",
+        "service_registries": ["http://localhost:9000/api"]
+    },
+    "cassandra": {
+        "nodes": ["127.0.0.1:9042"]
+    },
+    "quartz.webui": {
+        "root": "/quartz",
+        "instances": [
+            {
+                "host": "127.0.0.1",
+                "port": 80,
+                "accessible_at": "http://127.0.0.1:80",
+            }, {
+                "host": "127.0.0.1",
+                "port": 443,
+                "accessible_at": "http://127.0.0.1:80",
+            }
+        ]
+    },
+    "quartz.coremgmt": {
+        "root": "/quartz/coremgmt/api",
+        "instances": [
+            {
+                "host": "127.0.0.1",
+                "port": 8000,
+                "accessible_at": "http://127.0.0.1:8000",
+            }
+        ]
+    },
+    "quartz.notifier": {
+        "root": "/quartz/notifier/api",
+        "instances": [
+            {
+                "host": "127.0.0.1",
+                "port": 8001,
+                "accessible_at": "http://127.0.0.1:8001",
+            }
+        ]
+    },
+    "quartz.auth": {
+        "root": "/quartz/auth/api",
+        "instances": [
+            {
+                "host": "127.0.0.1",
+                "port": 8002,
+                "accessible_at": "http://127.0.0.1:8002",
+            }
+        ]
+    },
+    "quartz.plot": {
+        "root": "/quartz/plot/api",
+        "instances": [
+            {
+                "host": "127.0.0.1",
+                "port": 8003,
+                "accessible_at": "http://127.0.0.1:8003",
+            }
+        ]
+    },
+}
 
 
 def print_banner(config_file):
@@ -79,45 +100,29 @@ def start_single_service(service_module, host, port, accessible_at, service_regi
            accessible_at,
            "--service_registry"]
     cmd.extend(service_registry_list)
-    subprocess.Popen(cmd)
+    return subprocess.Popen(cmd)
 
 
-def start_service(name, config):
-    start_single_service("quartz.service.{}.service".format(name),
-                         host=config.get("quartz.{}".format(name), "host"),
-                         port=config.get("quartz.{}".format(name), "port"),
-                         accessible_at=config.get("quartz.{}".format(name), "accessible_at"),
-                         service_registry_list=config.get("services", "service_registry").split(","))
+def start_services(name, config):
+    return start_single_service("quartz.service.{}.service".format(name),
+                                host=config.get("quartz.{}".format(name), "host"),
+                                port=config.get("quartz.{}".format(name), "port"),
+                                accessible_at=config.get("quartz.{}".format(name), "accessible_at"),
+                                service_registry_list=config.get("services", "service_registry").split(","))
 
 
 @cli.command("start", help="The INI configuration file with the desired parameters")
-@click.option("--all", help="Start one instance of each services", is_flag=True)
-@click.option("--auth", help="Start an instance of quartz.auth", is_flag=True)
-@click.option("--coremgmt", help="Start an instance of quartz.coremgmt", is_flag=True)
-@click.option("--plot", help="Start an instance of quartz.plot", is_flag=True)
-@click.option("--notifier", help="Start an instance of quartz.notifier", is_flag=True)
-@click.option("--webui", help="Start an instance of quartz.webui", is_flag=True)
 @click.argument("config")
-def start(all, auth, coremgmt, plot, notifier, webui, config):
+def start(config):
     print_banner(config)
-    config = configparser.ConfigParser()
-    config.read(config)
-    if all:
-        auth = coremgmt = plot = notifier = webui = True
+    with open(config) as f:
+        jsonconfig = json.load(f)
+    config = jsonconfig
 
-    if webui:
-        start_service("webui", config)
-    if coremgmt:
-        start_service("coremgmt", config)
-    if auth:
-        start_service("auth", config)
-    if notifier:
-        start_service("notifier", config)
-    if plot:
-        start_service("plot", config)
+    MasterDaemon(config).start_instances()
 
 
-SAMPLE_CONFIG = DEFAULT_INI
+SAMPLE_CONFIG = json.dumps(DEFAULTS, indent=4, sort_keys=True)
 
 
 @cli.command("init", help="Writes a sample configuration file to STDOUT. Can be used as template"
